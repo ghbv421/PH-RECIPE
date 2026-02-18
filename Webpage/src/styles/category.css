@@ -1,0 +1,54 @@
+/* Layout and Main Background */
+.layout {
+  display: flex;
+  background-color: #d9d2c3; /* Beige background from your image */
+  min-height: 100vh;
+}
+
+.main {
+  flex: 1;
+}
+
+.content {
+  padding: 25px;
+}
+
+/* Category Grid */
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Matches the 2-column layout in your photo */
+  gap: 20px;
+}
+
+/* Category Cards */
+.category-card {
+  position: relative;
+  height: 250px;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.category-card:hover {
+  transform: scale(1.02);
+}
+
+.category-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensures the recipe image fills the card */
+  display: block;
+}
+
+/* Text Overlay (Bottom Left) */
+.category-label {
+  position: absolute;
+  bottom: 15px;
+  left: 20px;
+  color: white;
+  font-size: 28px; /* Slightly larger to match your design */
+  font-weight: 500;
+  font-family: Arial, sans-serif;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6); /* Critical for readability on light images */
+}

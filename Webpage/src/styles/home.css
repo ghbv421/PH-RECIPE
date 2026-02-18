@@ -1,0 +1,253 @@
+/* Ensure the body takes up full height and removes default margins */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow-x: hidden; /* Prevents unwanted horizontal scrolls */
+}
+
+/* Layout */
+.layout {
+  display: flex;
+  height: 100;
+  background: #d9d2c3;
+}
+
+/* Sidebar */
+/* Make Sidebar Sticky */
+.sidebar {
+  width: 220px;
+  background: #eee7da;
+  position: sticky; /* Keep it fixed on the side */
+  top: 0;
+  height: 100vh; 
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.logo {
+  color: orange;
+  padding: 20px;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  transition: 0.2s;
+
+}
+
+.sidebar li {
+  padding: 15px;
+  border-bottom: 1px solid #ccc;
+}
+
+.sidebar li:hover {
+  background: #ffb347;
+  cursor: pointer;
+}
+.sidebar li.active {
+  background: orange;
+}
+
+/* Container to push the button to the bottom */
+.logout-container {
+  padding: 20px;
+  border-top: 1px solid #ccc; /* Optional: adds a separator */
+}
+
+.logout-button {
+  width: 100%;
+  padding: 12px;
+  background-color: transparent;
+  color: #333;
+  border: 2px solid orange; /* Matching your PH Recipe orange theme */
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.logout-button:hover {
+  background-color: orange;
+  color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.logout-button:active {
+  transform: scale(0.98); /* Slight click effect */
+}
+
+/* Main */
+.main {
+  flex: 1;
+  padding: 20px;
+}
+
+/* Header */
+.top-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.search {
+  width: 350px;
+  padding: 10px;
+  border-radius: 20px;
+  border: none;
+  
+}
+.search:focus {
+  outline: none;
+  box-shadow: 0 0 8px rgba(255,140,0,0.6);
+}
+
+
+.header-right span {
+  margin-left: 15px;
+}
+
+/* Hero */
+.hero {
+  position: relative;
+}
+
+.hero img {
+  width: 100%;
+  height: 420px;
+  object-fit: cover;
+  border-radius: 10px;
+  display: block;
+}
+
+.top-list-wrap {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(0,0,0,0.55);
+  padding: 6px 10px;
+  border-radius: 10px;
+}
+
+.top-list-label {
+  color: #ffffff;
+  font-size: 14px;
+  margin-right: 6px;
+  padding-right: 8px;
+  border-right: 1px solid rgba(255,255,255,0.15);
+}
+
+.top-list {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.top-list img {
+  width: 54px;
+  height: 54px;
+  object-fit: cover;
+  display: block;
+  border-radius: 8px;
+  margin: 0;
+  transition: transform 0.18s ease;
+  border: 2px solid rgba(255,255,255,0.9);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+}
+.top-list img:hover {
+  transform: scale(1.12);
+}
+
+.hero h1 {
+  position: absolute;
+  top: 20px;
+  left: 30px;
+  color: white;
+  font-size: 64px;
+  font-family: Georgia, 'Times New Roman', serif;
+  text-shadow: 0 3px 8px rgba(0,0,0,0.6);
+  text-decoration: underline;
+}
+
+/* Recipes */
+.new-recipes {
+  margin-top: 20px;
+}
+
+.recipe-grid {
+  display: flex;
+  gap: 15px;
+}
+
+.recipe-card {
+  overflow: hidden;
+}
+/* The Taller Beef Tapa Styling */
+.recipe-card.tall-card img {
+  height: 280px; /* Adjust this to match your design height */
+  object-fit: cover;
+}
+
+.recipe-card img {
+  width: 150px;
+  border-radius: 10px;
+  transition: transform 0.4s ease;
+}
+
+.recipe-card:hover img {
+  transform: scale(1.08);
+}
+
+/* Container for the image to allow absolute positioning of the heart */
+.image-container {
+  position: relative;
+  display: inline-block;
+}
+
+.recipe-card img {
+  display: block;
+  border-radius: 10px;
+  width: 150px;
+  transition: transform 0.4s ease;
+}
+
+/* Heart Button Styling */
+.heart-button {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: rgba(255, 255, 255, 0.7); /* Semi-transparent circle */
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 18px;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+
+.heart-button:hover {
+  background: white;
+  transform: scale(1.1);
+}
+
+/* When active (clicked) */
+.heart-button.active {
+  color: red;
+  background: white;
+}
+
+.recipe-title {
+  margin-top: 8px;
+  font-weight: 500;
+  font-size: 14px;
+}

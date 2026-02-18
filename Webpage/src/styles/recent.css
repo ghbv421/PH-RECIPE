@@ -1,0 +1,16 @@
+.layout {
+  display: flex;
+  background-color: #d9d2c3; /* The warm beige background */
+  min-height: 100vh;
+}
+
+.main {
+  flex: 1;
+  padding: 20px;
+}
+
+/* Ensure the Sidebar component inside has these colors */
+.sidebar {
+  background-color: #eee7da; /* The lighter sidebar color */
+  width: 220px;
+}
