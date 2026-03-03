@@ -1,16 +1,248 @@
+/* Layout consistency */
 .layout {
   display: flex;
-  background-color: #d9d2c3; /* The warm beige background */
+  background-color: #d9d2c3;
   min-height: 100vh;
 }
 
 .main {
   flex: 1;
-  padding: 20px;
 }
 
-/* Ensure the Sidebar component inside has these colors */
-.sidebar {
-  background-color: #eee7da; /* The lighter sidebar color */
-  width: 220px;
+.content {
+  padding: 30px;
+}
+
+.recent-header {
+  margin-bottom: 30px;
+}
+
+.recent-header h1 {
+  font-family: 'Georgia', serif;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+/* Grid layout */
+.recent-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 30px;
+}
+
+/* Card Styling */
+.recent-card {
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+  transition: all 0.3s ease;
+}
+
+.recent-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+}
+
+/* Image & Badges */
+.recent-image-container {
+  position: relative;
+  height: 180px;
+  overflow: hidden;
+}
+
+.recent-image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.recent-card:hover img {
+  transform: scale(1.1);
+}
+
+.time-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: bold;
+  color: orange;
+  backdrop-filter: blur(4px);
+}
+
+.recent-heart {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: white;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.recent-heart.active {
+  color: red;
+}
+
+/* Info Section */
+.recent-info {
+  padding: 15px;
+  text-align: center;
+}
+
+.recent-info h3 {
+  font-size: 18px;
+  margin-bottom: 12px;
+  color: #444;
+}
+
+.view-btn {
+  background: transparent;
+  border: 1.5px solid orange;
+  color: orange;
+  padding: 8px 20px;
+  border-radius: 25px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.view-btn:hover {
+  background: orange;
+  color: white;
+}
+
+/* --- Modal Styles --- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px); /* Aesthetic blur effect */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+  background: white;
+  width: 80%;
+  max-width: 900px;
+  height: 80vh;
+  border-radius: 30px;
+  position: relative;
+  overflow: hidden;
+  animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+}
+
+.close-modal {
+  position: absolute;
+  top: 20px;
+  right: 25px;
+  font-size: 35px;
+  background: white;
+  border: none;
+  cursor: pointer;
+  z-index: 10;
+  color: #333;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.modal-body {
+  display: flex;
+  height: 100%;
+}
+
+.modal-image {
+  flex: 1.2;
+}
+
+.modal-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.modal-details {
+  flex: 1;
+  padding: 40px;
+  overflow-y: auto;
+  background: #fffcf7; /* Slight off-white for contrast */
+}
+
+.modal-details h2 {
+  font-family: 'Georgia', serif;
+  font-size: 32px;
+  color: orange;
+  margin-bottom: 15px;
+}
+
+.modal-stats {
+  display: flex;
+  gap: 15px;
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.modal-details h3 {
+  margin-top: 25px;
+  font-size: 18px;
+  border-left: 4px solid orange;
+  padding-left: 10px;
+}
+
+.modal-details ul {
+  padding-left: 20px;
+  margin-top: 10px;
+  color: #444;
+}
+
+.start-cooking {
+  margin-top: 30px;
+  width: 100%;
+  padding: 15px;
+  background: orange;
+  color: white;
+  border: none;
+  border-radius: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 16px;
+  transition: 0.3s;
+}
+
+.start-cooking:hover {
+  background: #e69500;
+  transform: translateY(-2px);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(50px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }

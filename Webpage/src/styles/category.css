@@ -1,54 +1,125 @@
-/* Layout and Main Background */
+/* Layout & Main Background */
 .layout {
   display: flex;
-  background-color: #d9d2c3; /* Beige background from your image */
+  background-color: #d9d2c3; /* Theme beige */
   min-height: 100vh;
 }
 
 .main {
   flex: 1;
+  padding-top: 100px; /* Offset for the fixed header */
 }
 
 .content {
-  padding: 25px;
+  padding: 0 40px 40px 40px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-/* Category Grid */
+/* Page Header */
+.category-header {
+  margin-bottom: 35px;
+}
+
+.category-header h1 {
+  font-family: 'Georgia', serif;
+  font-size: 2.5rem;
+  color: #2c2c2c;
+  margin-bottom: 5px;
+}
+
+.category-header p {
+  color: #666;
+  font-size: 1.1rem;
+}
+
+/* Category Grid - Modern 2-column or 3-column */
 .category-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr); /* Matches the 2-column layout in your photo */
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 30px;
 }
 
 /* Category Cards */
 .category-card {
   position: relative;
-  height: 250px;
-  border-radius: 10px;
+  height: 300px;
+  border-radius: 24px;
   overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease;
+  background: white;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .category-card:hover {
-  transform: scale(1.02);
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* Image Wrapper & Zoom Logic */
+.category-image-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
 }
 
 .category-img {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* Ensures the recipe image fills the card */
-  display: block;
+  object-fit: cover;
+  transition: transform 0.6s ease;
 }
 
-/* Text Overlay (Bottom Left) */
-.category-label {
+.category-card:hover .category-img {
+  transform: scale(1.1);
+}
+
+/* Gradient Overlay for Readability */
+.category-overlay {
   position: absolute;
-  bottom: 15px;
-  left: 20px;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 50%);
+}
+
+/* Content Overlay */
+.category-info {
+  position: absolute;
+  bottom: 25px;
+  left: 30px;
+  right: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  z-index: 2;
+}
+
+.category-label {
   color: white;
-  font-size: 28px; /* Slightly larger to match your design */
-  font-weight: 500;
-  font-family: Arial, sans-serif;
-  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6); /* Critical for readability on light images */
+  font-size: 32px;
+  font-weight: 700;
+  font-family: 'Georgia', serif;
+  text-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.explore-btn {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 50px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.explore-btn:hover {
+  background: orange;
+  border-color: orange;
 }

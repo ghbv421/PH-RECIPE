@@ -1,6 +1,6 @@
 import Sidebar from "../components/Sidebar";
 import Header from "../components/headers";
-import HeroBanner from "../components/HeroBanner";
+import HeroBanner from "../components/HeroBanner"; // Importing the child
 import RecipeCard from "../components/RecipeCard";
 import recipes from "../data/recipes";
 import "../styles/home.css";
@@ -11,19 +11,22 @@ export default function Home() {
       <Sidebar />
       <div className="main">
         <Header />
-        <HeroBanner />
-        <section className="new-recipes">
-          <h3>Newly Recipes Added &gt;</h3>
-          <div className="recipe-grid">
-            {recipes.map(recipe => (
-              <RecipeCard 
-                key={recipe.id} 
-                recipe={recipe} 
-                isTall={recipe.title === "Beef Tapa"} 
-              />
-            ))}
-          </div>
-        </section>
+        <div className="home-container">
+          {/* The HeroBanner is placed here as a single tag */}
+          <HeroBanner /> 
+          
+          <section className="new-recipes">
+            <div className="section-header">
+              <h3>Newly Added Recipes</h3>
+              <button className="view-all-btn">View All &rarr;</button>
+            </div>
+            <div className="recipe-grid">
+              {recipes.map(recipe => (
+                <RecipeCard key={recipe.id} recipe={recipe} />
+              ))}
+            </div>
+          </section>
+        </div>
       </div>
     </div>
   );

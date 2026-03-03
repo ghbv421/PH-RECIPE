@@ -4,50 +4,53 @@ import "../styles/login.css";
 
 export default function Login() {
   const navigate = useNavigate();
-
-  const handleLogin = (e) => {
-    e.preventDefault();
-    navigate("/home");
-  };
+  const handleLogin = (e) => { e.preventDefault(); navigate("/home"); };
 
   return (
-    <div className="login-container">
+    <div className="login-page">
       <div className="login-card">
-        <h1 className="brand-title">PH RECIPE</h1>
-        
-        <h2 className="login-header">LogIn</h2>
-        
-        <form className="login-form" onSubmit={handleLogin}>
-          <div className="input-box">
-            <label>Email:</label>
-            <div className="input-field">
-              <span>📧</span>
-              <input type="email" placeholder="username@gmail.com" required />
+        <header className="login-header">
+          <h1 className="brand-logo">PH RECIPE</h1>
+          <p className="welcome-text">Taste of the Philippines</p>
+        </header>
+
+        <form onSubmit={handleLogin}>
+          <div className="input-group">
+            <div className="field-container">
+              <span className="field-icon">📧</span>
+              <input type="email" placeholder="Email Address" required />
             </div>
           </div>
 
-          <div className="input-box">
-            <label>Password:</label>
-            <div className="input-field">
-              <span>🔒</span>
-              <input type="password" placeholder="password:" required />
+          <div className="input-group">
+            <div className="field-container">
+              <span className="field-icon">🔒</span>
+              <input type="password" placeholder="Password" required />
             </div>
-            <a href="#" className="forgot-pass">Forget Password?</a>
+            <a href="#" className="forgot-link">Forgot Password?</a>
           </div>
 
-          <button type="submit" className="signin-btn">Sign in</button>
+          <button type="submit" className="login-btn">Sign In</button>
         </form>
 
-        <div className="separator">or continue with</div>
+        <div className="divider"><span>or</span></div>
 
-        <div className="social-login">
-          <button className="social-icon">G</button>
-          <button className="social-icon">📞</button>
-          <button className="social-icon">f</button>
+        <div className="social-row">
+          <button className="social-item">G</button>
+          <button className="social-item">f</button>
+          <button className="social-item">📞</button>
         </div>
 
-        <p className="signup-link">
-          Don't have an account yet? <a href="#">Sign Up</a>
+        <p className="footer-text">
+          New here? 
+          {/* UPDATED: Added navigate logic here */}
+          <span 
+            className="signup-link" 
+            style={{ cursor: 'pointer', marginLeft: '5px' }}
+            onClick={() => navigate("/signup")}
+          >
+            Create Account
+          </span>
         </p>
       </div>
     </div>
