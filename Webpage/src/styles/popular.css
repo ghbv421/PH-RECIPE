@@ -7,17 +7,24 @@
 
 .main {
   flex: 1;
+  padding-top: 80px; /* Offset for fixed header */
 }
 
 .content {
   padding: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .popular-header h1 {
-  font-family: 'Georgia', serif; /* Elegant food-themed font */
+  font-family: 'Georgia', serif;
   font-size: 2.2rem;
   color: #2c2c2c;
   margin-bottom: 8px;
+}
+
+.popular-header p {
+  color: #666;
 }
 
 /* Grid Layout */
@@ -31,10 +38,11 @@
 /* Card Styling */
 .popular-card {
   background: white;
-  border-radius: 24px; /* Extra rounded for a modern look */
+  border-radius: 24px;
   overflow: hidden;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  cursor: pointer;
 }
 
 .popular-card:hover {
@@ -42,7 +50,6 @@
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
 }
 
-/* Image Wrapper & Zoom */
 .image-wrapper {
   position: relative;
   height: 220px;
@@ -57,72 +64,27 @@
 }
 
 .popular-card:hover .image-wrapper img {
-  transform: scale(1.1) rotate(1deg); /* Added a tiny rotation for flair */
+  transform: scale(1.1);
 }
 
-/* Badges & Buttons */
 .trending-badge {
   position: absolute;
   top: 15px;
   left: 15px;
-  background: rgba(255, 165, 0, 0.9);
+  background: rgba(255, 140, 0, 0.9);
   color: white;
   padding: 6px 14px;
   border-radius: 50px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: bold;
   backdrop-filter: blur(5px);
 }
 
-.heart-btn {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  background: white;
-  border: none;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
-
-/* Info Section */
-.popular-info {
-  padding: 20px;
-}
-
-.title-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-.title-row h3 {
-  font-size: 18px;
-  margin: 0;
-  color: #333;
-}
-
-.price-tag {
-  background: #f0f0f0;
-  padding: 4px 10px;
-  border-radius: 8px;
-  font-size: 12px;
-  color: #666;
-}
-
-.stats-row {
-  display: flex;
-  gap: 15px;
-  font-size: 13px;
-  color: #888;
-  margin-bottom: 20px;
-}
+.popular-info { padding: 20px; }
+.title-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
+.title-row h3 { font-size: 18px; margin: 0; color: #333; }
+.price-tag { background: #f0f0f0; padding: 4px 10px; border-radius: 8px; font-size: 11px; }
+.stats-row { display: flex; gap: 15px; font-size: 12px; color: #888; margin-bottom: 20px; }
 
 .cook-now-btn {
   width: 100%;
@@ -136,7 +98,58 @@
   transition: 0.3s;
 }
 
-.cook-now-btn:hover {
-  background: #e69500;
-  letter-spacing: 1px;
+/* --- Modal Styles (Consistent with Favorites) --- */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.modal-content {
+  background: white;
+  width: 90%;
+  max-width: 900px;
+  border-radius: 30px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  animation: slideUp 0.4s ease;
+}
+
+.close-modal {
+  position: absolute;
+  top: 20px; right: 20px;
+  background: white; border: none; font-size: 24px;
+  cursor: pointer; z-index: 10; border-radius: 50%; width: 40px; height: 40px;
+}
+
+.modal-body { display: flex; width: 100%; }
+.modal-image { flex: 1.2; }
+.modal-image img { width: 100%; height: 100%; object-fit: cover; }
+
+.modal-details { flex: 1; padding: 40px; background: #fffcf7; }
+.modal-details h2 { font-family: 'Georgia', serif; font-size: 2rem; margin-bottom: 10px; }
+.modal-stats { display: flex; gap: 15px; font-size: 13px; color: #666; margin-bottom: 20px; }
+
+.start-cooking-btn {
+  width: 100%;
+  padding: 15px;
+  background: orange;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(50px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }

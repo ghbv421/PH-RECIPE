@@ -8,6 +8,7 @@ import Recent from "./pages/Recent";
 import Settings from "./pages/Settings";
 import Profile from "./pages/Profile";
 import Signup from "./pages/Signup";
+import Cooking from "./pages/Cooking";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
         <Route path="/settings" element={<Settings />} /> 
         <Route path="/profile" element={<Profile />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/cooking" element={<Cooking />} />
       </Routes>
     </Router>
   );

@@ -101,8 +101,8 @@ export default function Header() {
           style={profilePillStyle} 
           onClick={() => navigate("/profile")}
         >
-          <div style={avatarStyle}>JD</div>
-          <span style={{ fontSize: "14px", fontWeight: "600" }}>Juan Dela Cruz</span>
+          <div style={avatarStyle}>DRMF</div>
+          <span style={{ fontSize: "14px", fontWeight: "600" }}>Doremifa</span>
         </div>
       </div>
     </header>

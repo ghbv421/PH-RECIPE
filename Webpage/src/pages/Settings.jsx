@@ -17,7 +17,7 @@ export default function Settings() {
             </header>
 
             <div className="settings-grid">
-              {/* Profile Section */}
+
               <section className="settings-card">
                 <h3>Profile Information</h3>
                 <div className="profile-edit">
@@ -35,7 +35,6 @@ export default function Settings() {
                 </div>
               </section>
 
-              {/* Preferences Section */}
               <section className="settings-card">
                 <h3>System Preferences</h3>
                 <div className="preference-item">
@@ -62,7 +61,7 @@ export default function Settings() {
                 </div>
               </section>
 
-              {/* Security Section */}
+
               <section className="settings-card full-width">
                 <h3>Security</h3>
                 <button className="settings-btn secondary">Change Password</button>
