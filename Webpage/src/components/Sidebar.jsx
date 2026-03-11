@@ -44,6 +44,12 @@ export default function Sidebar() {
           >
             Recently Viewed
           </li>
+           <li
+            className={location.pathname === "/recent" ? "active" : ""}
+            onClick={() => navigate("/recent")}
+          >
+            angela
+          </li>
         </ul>
       </div>
 

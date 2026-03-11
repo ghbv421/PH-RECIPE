@@ -1,10 +1,15 @@
-import React from "react";
+import React, { useState } from "react"; // Added useState
 import { useNavigate } from "react-router-dom";
 import "../styles/login.css";
 
 export default function Login() {
   const navigate = useNavigate();
-  const handleLogin = (e) => { e.preventDefault(); navigate("/home"); };
+  const [showPassword, setShowPassword] = useState(false); // State for toggle
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    navigate("/home");
+  };
 
   return (
     <div className="login-page">
@@ -25,7 +30,20 @@ export default function Login() {
           <div className="input-group">
             <div className="field-container">
               <span className="field-icon">🔒</span>
-              <input type="password" placeholder="Password" required />
+              <input 
+                type={showPassword ? "text" : "password"} // Dynamic type
+                placeholder="Password" 
+                minLength="8" 
+                required 
+              />
+              {/* Toggle Icon */}
+              <span 
+                className="toggle-password" 
+                onClick={() => setShowPassword(!showPassword)}
+                style={{ cursor: 'pointer', fontSize: '14px', marginLeft: '8px' }}
+              >
+                {showPassword ? "👁️" : "🙈"}
+              </span>
             </div>
             <a href="#" className="forgot-link">Forgot Password?</a>
           </div>
@@ -43,7 +61,6 @@ export default function Login() {
 
         <p className="footer-text">
           New here? 
-          {/* UPDATED: Added navigate logic here */}
           <span 
             className="signup-link" 
             style={{ cursor: 'pointer', marginLeft: '5px' }}

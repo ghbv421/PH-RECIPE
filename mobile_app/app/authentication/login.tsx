@@ -45,7 +45,15 @@ export default function LoginScreen() {
           <Text style={styles.forgotText}>Forget Password?</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.signInButton}>
+        {/* Sign In Button */}
+        <TouchableOpacity 
+          style={styles.signInButton} 
+          onPress={() => {
+            // In a real app, you would add your authentication logic here
+            // For now, we go straight to the dashboard
+            router.replace('/dashboard/home');
+          }}
+        >
           <Text style={styles.signInButtonText}>Sign In</Text>
         </TouchableOpacity>
 

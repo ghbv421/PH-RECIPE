@@ -25,7 +25,7 @@ export default function Category() {
                     alt={recipe.title} 
                     className="category-img" 
                   />
-                  {/* Subtle gradient overlay for better text contrast */}
+
                   <div className="category-overlay"></div>
                 </div>
                 <div className="category-info">

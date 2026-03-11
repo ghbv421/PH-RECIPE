@@ -11,20 +11,20 @@ export default function Profile() {
         
         <div className="content">
           <div className="profile-container">
-            {/* Top Cover Section */}
+
             <div className="profile-cover">
               <div className="profile-avatar-wrapper">
-                <div className="profile-avatar-large">JD</div>
+                <div className="profile-avatar-large">DRMF</div>
               </div>
             </div>
 
             <div className="profile-header-info">
-              <h1>Juan Dela Cruz</h1>
+              <h1>Doremifa</h1>
               <p className="profile-subtitle">BSIT Student | Back-end Developer</p>
             </div>
 
             <div className="profile-grid">
-              {/* Personal Information Card */}
+
               <section className="profile-card">
                 <h3>Personal Information</h3>
                 <div className="info-list">
@@ -43,7 +43,7 @@ export default function Profile() {
                 </div>
               </section>
 
-              {/* Current Projects Card */}
+
               <section className="profile-card">
                 <h3>Active Projects</h3>
                 <div className="project-tags">
@@ -54,7 +54,7 @@ export default function Profile() {
                 <p className="project-desc">Currently focusing on ReactJS and IoT system integration.</p>
               </section>
 
-              {/* Statistics Section */}
+
               <section className="profile-card full-width">
                 <h3>Account Activity</h3>
                 <div className="stats-row">

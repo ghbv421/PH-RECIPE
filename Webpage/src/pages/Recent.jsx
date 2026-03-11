@@ -1,12 +1,13 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom"; // 1. Import useNavigate
 import Sidebar from "../components/Sidebar";
 import Header from "../components/headers";
 import recipes from "../data/recipes";
 import "../styles/recent.css";
 
 export default function Recent() {
-  // Removed favorites state to focus only on viewing history
   const [selectedRecipe, setSelectedRecipe] = useState(null);
+  const navigate = useNavigate(); // 2. Initialize hook
 
   return (
     <div className="layout">
@@ -27,7 +28,6 @@ export default function Recent() {
                   <div className="time-badge">
                     {index === 0 ? "Just now" : `${index + 1}h ago`}
                   </div>
-                  {/* Heart button removed from here */}
                 </div>
                 <div className="recent-info">
                   <h3>{recipe.title}</h3>
@@ -44,7 +44,6 @@ export default function Recent() {
         </div>
       </div>
 
-      {/* --- Aesthetic Modal remains for detailed viewing --- */}
       {selectedRecipe && (
         <div className="modal-overlay" onClick={() => setSelectedRecipe(null)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -70,7 +69,14 @@ export default function Recent() {
                 </ul>
                 <h3>Instructions</h3>
                 <p>Sauté the aromatics, add the main protein, and simmer until the flavors are perfectly locked in.</p>
-                <button className="start-cooking">Start Cooking Now</button>
+                
+                {/* 3. Updated Navigation Trigger */}
+                <button 
+                  className="start-cooking"
+                  onClick={() => navigate("/cooking", { state: { recipe: selectedRecipe } })}
+                >
+                  Start Cooking Now
+                </button>
               </div>
             </div>
           </div>

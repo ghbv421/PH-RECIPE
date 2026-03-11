@@ -7,6 +7,8 @@
 
 .main {
   flex: 1;
+  padding-top: 80px; /* Offset for the fixed header height */
+  overflow-y: auto;
 }
 
 .content {
