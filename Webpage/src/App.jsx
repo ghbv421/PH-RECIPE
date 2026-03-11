@@ -12,8 +12,9 @@ import Cooking from "./pages/Cooking";
 
 function App() {
   return (
-    <Router>
+    <Router basename="/PH-RECIPE/Webpage">
       <Routes>
+        {/* Landing page is Login */}
         <Route path="/" element={<Login />} />
         <Route path="/home" element={<Home />} />
         <Route path="/category" element={<Category />} />
