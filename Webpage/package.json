@@ -5,6 +5,7 @@
   "type": "module",
   "homepage": "https://ghbv421.github.io/PH-RECIPE/",
   "scripts": {
+<<<<<<< Updated upstream
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
@@ -12,6 +13,13 @@
     "predeploy": "npm run build",
     "deploy": "gh-pages -d Webpage/dist"
   },
+=======
+  "dev": "vite",
+  "build": "vite build",
+  "preview": "vite preview",
+  "deploy": "gh-pages -d dist"
+},
+>>>>>>> Stashed changes
   "dependencies": {
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
