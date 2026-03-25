@@ -1,72 +1,131 @@
 import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { Text, View, TouchableOpacity, ViewStyle, TextStyle, Dimensions } from 'react-native';
 import { useRouter } from 'expo-router';
+
+const { width } = Dimensions.get('window');
 
 export default function WelcomeScreen() {
   const router = useRouter();
 
   return (
-    <View style={styles.container}>
-      <View style={styles.titleContainer}>
-        <Text style={styles.titleText}>PH</Text>
-        <Text style={styles.titleText}>RECIPE</Text>
-      </View>
+    <View style={styles.layout}>
+      {/* Decorative Background Element for "Vibes" */}
+      <View style={styles.circleDecorator} />
+      
+      <View style={styles.contentWrapper}>
+        <View style={styles.titleSection}>
+          <Text style={styles.brandText}>PH</Text>
+          <Text style={[styles.brandText, { color: '#333' }]}>RECIPE</Text>
+          <View style={styles.underline} />
+        </View>
 
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity 
-          style={styles.button} 
-          onPress={() => router.push('/authentication/login')}
-        >
-          <Text style={styles.buttonText}>Sign In</Text>
-        </TouchableOpacity>
+        <Text style={styles.subtitle}>
+          Authentic Filipino flavors, {"\n"}right at your fingertips.
+        </Text>
 
-        <TouchableOpacity 
-          style={[styles.button, styles.signUpButton]} 
-          onPress={() => router.push('/authentication/register')}
-        >
-          <Text style={styles.buttonText}>Sign up an account</Text>
-        </TouchableOpacity>
+        <View style={styles.buttonGroup}>
+          <TouchableOpacity 
+            activeOpacity={0.8}
+            style={[styles.button, styles.primaryButton]} 
+            onPress={() => router.push('/authentication/login')}
+          >
+            <Text style={styles.primaryButtonText}>Sign In</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            activeOpacity={0.7}
+            style={[styles.button, styles.secondaryButton]} 
+            onPress={() => router.push('/authentication/register')}
+          >
+            <Text style={styles.secondaryButtonText}>Create Account</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
+const styles = {
+  layout: {
     flex: 1,
-    backgroundColor: '#FFDAB9', // Peach background
+    backgroundColor: '#FDF7F0', // A lighter, creamier version of your beige
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 40,
-  },
-  titleContainer: {
-    marginBottom: 80,
+  } as ViewStyle,
+  circleDecorator: {
+    position: 'absolute',
+    top: -width * 0.2,
+    right: -width * 0.2,
+    width: width,
+    height: width,
+    borderRadius: width / 2,
+    backgroundColor: '#EEE7DA', // Matches your sidebar color
+    opacity: 0.5,
+  } as ViewStyle,
+  contentWrapper: {
+    width: '85%',
     alignItems: 'center',
-  },
-  titleText: {
-    fontSize: 64,
+    zIndex: 2,
+  } as ViewStyle,
+  titleSection: {
+    marginBottom: 20,
+    alignItems: 'center',
+  } as ViewStyle,
+  brandText: {
+    fontSize: 72,
     fontWeight: '900',
-    color: '#FF4500', // Bright orange/red for text
-    fontFamily: 'serif', // Matches the serif look in your image
+    color: '#FF8C00', // Deep Orange from your logo
+    fontFamily: 'System', // Use 'Georgia' if linked
     lineHeight: 70,
-  },
-  buttonContainer: {
+    letterSpacing: -3,
+  } as TextStyle,
+  underline: {
+    width: 60,
+    height: 6,
+    backgroundColor: '#FF8C00',
+    marginTop: 10,
+    borderRadius: 3,
+  } as ViewStyle,
+  subtitle: {
+    fontSize: 18,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 60,
+    fontFamily: 'System',
+    lineHeight: 24,
+  } as TextStyle,
+  buttonGroup: {
     width: '100%',
     gap: 15,
-  },
+  } as ViewStyle,
   button: {
-    backgroundColor: '#F2994A', // Lighter orange button
-    paddingVertical: 18,
-    borderRadius: 30,
+    height: 60,
+    borderRadius: 18, // Matches your recipe card rounding
+    justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
-  },
-  signUpButton: {
-    marginTop: 10,
-  },
-  buttonText: {
-    color: '#FFFFFF',
+  } as ViewStyle,
+  primaryButton: {
+    backgroundColor: '#FF8C00',
+    shadowColor: '#FF8C00',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+    elevation: 8,
+  } as ViewStyle,
+  secondaryButton: {
+    backgroundColor: 'white',
+    borderWidth: 1,
+    borderColor: '#DDD',
+  } as ViewStyle,
+  primaryButtonText: {
+    color: 'white',
     fontSize: 18,
-    fontFamily: 'serif',
-  },
-});
+    fontWeight: '700',
+  } as TextStyle,
+  secondaryButtonText: {
+    color: '#333',
+    fontSize: 18,
+    fontWeight: '600',
+  } as TextStyle,
+};
