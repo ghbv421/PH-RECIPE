@@ -10,7 +10,8 @@ import {
   Dimensions,
   ViewStyle,
   TextStyle,
-  ImageStyle
+  ImageStyle,
+  ImageSourcePropType
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { SharedHeader } from '../../components/SharedHeader';
@@ -18,24 +19,46 @@ import { Feather } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
 
+// UPDATED: image type to accept required assets
 interface Recipe {
   id: string;
   name: string;
-  image: string;
+  image: ImageSourcePropType; 
   category: string;
 }
 
 const DATA: Recipe[] = [
-  { id: '1', name: 'Arroz Caldo', image: 'https://placehold.co/300x300.png', category: 'Rice' },
-  { id: '2', name: 'Garlic Rice', image: 'https://placehold.co/300x300.png', category: 'Rice' },
-  { id: '3', name: 'Beef Pares', image: 'https://placehold.co/300x300.png', category: 'Main' },
-  { id: '4', name: 'Binagoongan', image: 'https://placehold.co/300x300.png', category: 'Pork' },
+  { 
+    id: '1', 
+    name: 'Arroz Caldo', 
+    image: require('../../assets/images/arroz_caldo.png'),
+    category: 'Rice' 
+  },
+  { 
+    id: '2', 
+    name: 'Garlic Rice', 
+    image: require('../../assets/images/garlic_rice.png'), 
+    category: 'Rice' 
+  },
+  { 
+    id: '3', 
+    name: 'Beef Pares', 
+    image: require('../../assets/images/beefpares.png'), 
+    category: 'Main' 
+  },
+  { 
+    id: '4', 
+    name: 'Binagoongan', 
+    image: require('../../assets/images/binagoongan.png'), 
+    category: 'Pork' 
+  },
 ];
 
-const RecipeItem = ({ name, image }: { name: string, image: string }) => (
+// UPDATED: image prop is passed directly to source
+const RecipeItem = ({ name, image }: { name: string, image: ImageSourcePropType }) => (
   <TouchableOpacity activeOpacity={0.9} style={styles.recipeCard}>
     <View style={styles.imageWrapper}>
-      <Image source={{ uri: image }} style={styles.thumb} />
+      <Image source={image} style={styles.thumb} />
     </View>
     <Text style={styles.recipeName} numberOfLines={1}>{name}</Text>
     <View style={styles.ratingRow}>

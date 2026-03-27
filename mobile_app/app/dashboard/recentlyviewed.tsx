@@ -8,7 +8,8 @@ import {
   TouchableOpacity,
   ViewStyle,
   TextStyle,
-  ImageStyle 
+  ImageStyle,
+  ImageSourcePropType // Added for local asset typing
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { SharedHeader } from '../../components/SharedHeader';
@@ -17,21 +18,42 @@ import { Feather } from '@expo/vector-icons';
 interface RecentRecipe {
   id: string;
   name: string;
-  image: string;
+  image: ImageSourcePropType; // UPDATED to handle require()
   viewedAt: string;
 }
 
 export default function RecentlyViewedScreen({ title = "Recently Viewed" }) {
   const DATA: RecentRecipe[] = [
-    { id: '1', name: 'Garlic Rice', image: 'https://images.unsplash.com/photo-1512058560366-cd2427ffeb56', viewedAt: '2h ago' },
-    { id: '2', name: 'Arroz Caldo', image: 'https://images.unsplash.com/photo-1626777553732-48995a67f0f6', viewedAt: '5h ago' },
-    { id: '3', name: 'Sisig Special', image: 'https://images.unsplash.com/photo-1604382354936-07c5d9983bd3', viewedAt: 'Yesterday' },
-    { id: '4', name: 'Crispy Lechon', image: 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0', viewedAt: '2 days ago' },
+    { 
+      id: '1', 
+      name: 'Garlic Rice', 
+      image: require('../../assets/images/garlic_rice.png'), 
+      viewedAt: '2h ago' 
+    },
+    { 
+      id: '2', 
+      name: 'Arroz Caldo', 
+      image: require('../../assets/images/arroz_caldo.png'), 
+      viewedAt: '5h ago' 
+    },
+    { 
+      id: '3', 
+      name: 'Sisig Special', 
+      image: require('../../assets/images/sisig.png'), 
+      viewedAt: 'Yesterday' 
+    },
+    { 
+      id: '4', 
+      name: 'Crispy Lechon', 
+      image: require('../../assets/images/crispy_lechon.png'), 
+      viewedAt: '2 days ago' 
+    },
   ];
 
   const renderItem = ({ item }: { item: RecentRecipe }) => (
     <TouchableOpacity activeOpacity={0.9} style={styles.card}>
-      <Image source={{ uri: item.image }} style={styles.img} />
+      {/* UPDATED: source={item.image} for local files */}
+      <Image source={item.image} style={styles.img} />
       
       <View style={styles.cardContent}>
         <Text style={styles.name} numberOfLines={1}>{item.name}</Text>
@@ -60,7 +82,7 @@ export default function RecentlyViewedScreen({ title = "Recently Viewed" }) {
         ListHeaderComponent={() => (
           <View style={styles.headerArea}>
             <Text style={styles.title}>{title}</Text>
-            <TouchableOpacity style={styles.clearBtn}>
+            <TouchableOpacity style={styles.clearBtn} activeOpacity={0.7}>
               <Text style={styles.clearText}>Clear All</Text>
             </TouchableOpacity>
           </View>
@@ -93,7 +115,7 @@ const styles = StyleSheet.create({
   clearBtn: {
     backgroundColor: 'rgba(255, 140, 0, 0.1)',
     paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingVertical: 8,
     borderRadius: 10,
   } as ViewStyle,
   clearText: {
@@ -110,7 +132,7 @@ const styles = StyleSheet.create({
   } as ViewStyle,
   card: { 
     backgroundColor: '#FFF', 
-    width: '47%', 
+    width: '48%', 
     borderRadius: 25, 
     marginBottom: 18, 
     elevation: 4,
@@ -123,6 +145,7 @@ const styles = StyleSheet.create({
   img: { 
     width: '100%', 
     height: 130, 
+    resizeMode: 'cover'
   } as ImageStyle,
   viewBadge: {
     position: 'absolute',
@@ -131,6 +154,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
     padding: 6,
     borderRadius: 10,
+    zIndex: 1,
   } as ViewStyle,
   cardContent: {
     padding: 12,

@@ -9,7 +9,8 @@ import {
   Dimensions,
   ViewStyle,
   TextStyle,
-  ImageStyle
+  ImageStyle,
+  ImageSourcePropType // Added for local asset typing
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { SharedHeader } from '../../components/SharedHeader';
@@ -17,22 +18,58 @@ import { Feather } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
 
-interface Category { id: string; title: string; image: string; count: string; }
+// UPDATED: image type to accept both required assets and URI strings
+interface Category { 
+  id: string; 
+  title: string; 
+  image: ImageSourcePropType; 
+  count: string; 
+}
 
 const CATEGORIES: Category[] = [
-  { id: '1', title: 'Rice Dishes', image: 'https://images.unsplash.com/photo-1512058560366-cd2427ffeb56', count: '12 Recipes' },
-  { id: '2', title: 'Meat & Poultry', image: 'https://images.unsplash.com/photo-1544025162-d76694265947', count: '25 Recipes' },
-  { id: '3', title: 'Fresh Seafood', image: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2', count: '18 Recipes' },
-  { id: '4', title: 'Vegetables', image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999', count: '15 Recipes' },
-  { id: '5', title: 'Sweet Desserts', image: 'https://images.unsplash.com/photo-1551024601-bec78aea704b', count: '10 Recipes' },
-  { id: '6', title: 'Cold Drinks', image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd', count: '8 Recipes' },
+  { 
+    id: '1', 
+    title: 'Rice Dishes', 
+    image: require('../../assets/images/garlic_rice.png'), // UPDATED to local asset
+    count: '12 Recipes' 
+  },
+  { 
+    id: '2', 
+    title: 'Meat & Poultry', 
+    image: { uri: 'https://images.unsplash.com/photo-1544025162-d76694265947' }, 
+    count: '25 Recipes' 
+  },
+  { 
+    id: '3', 
+    title: 'Fresh Seafood', 
+    image: { uri: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2' }, 
+    count: '18 Recipes' 
+  },
+  { 
+    id: '4', 
+    title: 'Vegetables', 
+    image: { uri: 'https://images.unsplash.com/photo-1540420773420-3366772f4999' }, 
+    count: '15 Recipes' 
+  },
+  { 
+    id: '5', 
+    title: 'Sweet Desserts', 
+    image: { uri: 'https://images.unsplash.com/photo-1551024601-bec78aea704b' }, 
+    count: '10 Recipes' 
+  },
+  { 
+    id: '6', 
+    title: 'Cold Drinks', 
+    image: { uri: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd' }, 
+    count: '8 Recipes' 
+  },
 ];
 
 export default function CategoriesScreen() {
   const renderItem = ({ item }: { item: Category }) => (
     <TouchableOpacity activeOpacity={0.9} style={styles.card}>
       <ImageBackground 
-        source={{ uri: item.image }} 
+        source={item.image} // UPDATED: source passed directly
         style={styles.imageBg} 
         imageStyle={{ borderRadius: 25 }}
       >
@@ -108,6 +145,8 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 10,
+    // Fix for Android shadow + borderRadius
+    backgroundColor: 'transparent',
   } as ViewStyle,
   imageBg: { 
     width: '100%', 
@@ -115,7 +154,7 @@ const styles = StyleSheet.create({
   } as ImageStyle,
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.3)', // Subtle darkening
+    backgroundColor: 'rgba(0,0,0,0.4)', // Slightly darker to ensure white text is readable over Garlic Rice
     borderRadius: 25,
     padding: 15,
     justifyContent: 'space-between',
@@ -124,10 +163,13 @@ const styles = StyleSheet.create({
     fontSize: 18, 
     fontWeight: '800', 
     color: 'white',
+    textShadowColor: 'rgba(0, 0, 0, 0.5)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
   } as TextStyle,
   recipeCount: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.8)',
+    color: 'rgba(255,255,255,0.9)',
     fontWeight: '600',
     marginTop: 2,
   } as TextStyle,

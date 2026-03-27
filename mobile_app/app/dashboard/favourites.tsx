@@ -9,7 +9,8 @@ import {
   ViewStyle,
   TextStyle,
   ImageStyle,
-  Dimensions
+  Dimensions,
+  ImageSourcePropType
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { SharedHeader } from '../../components/SharedHeader';
@@ -17,23 +18,50 @@ import { Feather } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
 
-interface Fav { id: string; name: string; image: string; time: string; }
+// UPDATED: image type to accept required assets
+interface Fav { 
+  id: string; 
+  name: string; 
+  image: ImageSourcePropType; 
+  time: string; 
+}
 
 const FAVS: Fav[] = [
-  { id: '1', name: 'Garlic Rice', image: 'https://images.unsplash.com/photo-1512058560366-cd2427ffeb56', time: '15 min' },
-  { id: '2', name: 'Arroz Caldo', image: 'https://images.unsplash.com/photo-1626777553732-48995a67f0f6', time: '30 min' },
-  { id: '3', name: 'Sinigang', image: 'https://images.unsplash.com/photo-1625398407796-82650a8c135f', time: '45 min' },
-  { id: '4', name: 'Adobo', image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c', time: '40 min' },
+  { 
+    id: '1', 
+    name: 'Garlic Rice', 
+    image: require('../../assets/images/garlic_rice.png'), 
+    time: '15 min' 
+  },
+  { 
+    id: '2', 
+    name: 'Arroz Caldo', 
+    image: require('../../assets/images/arroz_caldo.png'), 
+    time: '30 min' 
+  },
+  { 
+    id: '3', 
+    name: 'Beef Pares', 
+    image: require('../../assets/images/beefpares.png'), 
+    time: '45 min' 
+  },
+  { 
+    id: '4', 
+    name: 'Binagoongan', 
+    image: require('../../assets/images/binagoongan.png'), 
+    time: '40 min' 
+  },
 ];
 
 export default function FavouritesScreen() {
   const renderItem = ({ item }: { item: Fav }) => (
     <TouchableOpacity activeOpacity={0.9} style={styles.card}>
-      <Image source={{ uri: item.image }} style={styles.img} />
+      {/* UPDATED: source passed directly as item.image */}
+      <Image source={item.image} style={styles.img} />
       
       {/* Absolute positioned heart icon */}
       <View style={styles.heartBadge}>
-        <Feather name="heart" size={14} color="white" fill="#FF4B4B" />
+        <Feather name="heart" size={14} color="#FF4B4B" fill="#FF4B4B" />
       </View>
 
       <View style={styles.cardContent}>
@@ -97,7 +125,7 @@ const styles = StyleSheet.create({
   } as ViewStyle,
   card: { 
     backgroundColor: '#FFF', 
-    width: '47%', 
+    width: '48%', // Slightly wider to balance the row
     borderRadius: 25, 
     marginBottom: 18, 
     elevation: 4,
@@ -109,6 +137,7 @@ const styles = StyleSheet.create({
   img: { 
     width: '100%', 
     height: 150, 
+    resizeMode: 'cover'
   } as ImageStyle,
   heartBadge: {
     position: 'absolute',
