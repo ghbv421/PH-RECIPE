@@ -1,10 +1,20 @@
 import React from 'react';
 import { StyleSheet, Text, View, TextInput, Platform, TouchableOpacity } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { useRouter } from 'expo-router'; // 1. Import useRouter
+import { useRouter } from 'expo-router';
 
-export const SharedHeader = () => {
-  const router = useRouter(); // 2. Initialize router
+// 1. Define the Interface with '?' to make props optional
+// This prevents the error in favourites.tsx
+interface SharedHeaderProps {
+  searchQuery?: string;
+  onSearchChange?: (text: string) => void;
+}
+
+export const SharedHeader = ({ 
+  searchQuery = '', 
+  onSearchChange 
+}: SharedHeaderProps) => {
+  const router = useRouter();
 
   return (
     <View style={styles.headerContainer}>
@@ -24,7 +34,6 @@ export const SharedHeader = () => {
             <Feather name="bell" size={20} color="#333" />
           </TouchableOpacity>
 
-          {/* 3. Updated Profile Navigation */}
           <TouchableOpacity 
             style={styles.iconCircle} 
             onPress={() => router.push('/profile/profile_details')}
@@ -41,9 +50,17 @@ export const SharedHeader = () => {
             placeholder="Search delicious recipes..." 
             placeholderTextColor="#999"
             style={styles.searchInput} 
+            value={searchQuery}
+            // Only call onSearchChange if it was actually passed as a prop
+            onChangeText={(text) => onSearchChange?.(text)}
+            clearButtonMode="while-editing"
           />
-          <TouchableOpacity>
-            <Feather name="sliders" size={18} color="#888" />
+          <TouchableOpacity onPress={() => searchQuery.length > 0 ? onSearchChange?.('') : null}>
+            <Feather 
+              name={searchQuery.length > 0 ? "x" : "sliders"} 
+              size={18} 
+              color={searchQuery.length > 0 ? "#FF8C00" : "#888"} 
+            />
           </TouchableOpacity>
         </View>
       </View>

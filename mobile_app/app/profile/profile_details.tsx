@@ -76,13 +76,13 @@ export default function ProfileDetails() {
             icon="heart" 
             title="Saved Recipes" 
             sub="Your collection of tastes" 
-            onPress={() => router.push('/favourites' as any)} 
+            onPress={() => router.push('dashboard/favourites' as any)} 
           />
           <ModernMenuItem 
             icon="check-circle" 
             title="Cooking History" 
             sub="28 recipes completed" 
-            onPress={() => router.push('/recentlyviewed' as any)} 
+            onPress={() => router.push('dashboard/recentlyviewed' as any)} 
           />
 
           {/* New Basic Profile Settings */}
