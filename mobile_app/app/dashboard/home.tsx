@@ -34,44 +34,12 @@ const RecipeImages: { [key: string]: any } = {
   humba: require('../../assets/images/humba.png'),
 };
 
-// --- MASTER INGREDIENTS LISTS ---
 const CATEGORY_INGREDIENTS = {
-  Rice: [
-    '4 cups Cooked Rice',
-    '6 cloves Minced Garlic',
-    '2 tbsp Cooking Oil',
-    '1 tsp Salt',
-    '1/2 tsp Black Pepper',
-    'Spring onions for garnish',
-    'Toasted garlic bits',
-    '1/2 tsp MSG (optional)',
-    '1 tbsp Butter (for extra flavor)'
-  ],
-  Meat: [
-    '500g Choice of Meat',
-    '1/2 cup Soy Sauce',
-    '1/4 cup Vinegar',
-    '4 cloves Garlic, smashed',
-    '2 pcs Bay Leaves',
-    '1 tsp Whole Peppercorns',
-    '1 tbsp Brown Sugar',
-    '1 cup Water',
-    '2 tbsp Cooking Oil'
-  ],
-  Vegetable: [
-    '2 cups Chopped Vegetables',
-    '1 pc Onion, sliced',
-    '2 cloves Garlic, minced',
-    '1 tbsp Ginger, sliced',
-    '1 tbsp Fish Sauce (Patis)',
-    '2 cups Vegetable/Beef Broth',
-    '1/2 tsp Salt',
-    '1/4 tsp Ground Pepper',
-    'Fresh chilies'
-  ]
+  Rice: ['4 cups Cooked Rice', '6 cloves Minced Garlic', '2 tbsp Cooking Oil', '1 tsp Salt'],
+  Meat: ['500g Choice of Meat', '1/2 cup Soy Sauce', '1/4 cup Vinegar', '4 cloves Garlic'],
+  Vegetable: ['2 cups Chopped Vegetables', '1 pc Onion', '2 cloves Garlic', '1 tbsp Ginger']
 };
 
-// --- TYPES ---
 interface Recipe {
   id: string;
   name: string;
@@ -82,35 +50,39 @@ interface Recipe {
   ingredients: string[];
 }
 
-// --- DATA ---
 const DATA: Recipe[] = [
   { id: '1', name: 'Arroz Caldo', imageKey: 'arroz_caldo', category: 'Rice', rating: 4.8, time: '45m', ingredients: CATEGORY_INGREDIENTS.Rice },
   { id: '2', name: 'Garlic Rice', imageKey: 'garlic_rice', category: 'Rice', rating: 4.5, time: '15m', ingredients: CATEGORY_INGREDIENTS.Rice },
-  { id: '11', name: 'Lechon Rice Bowl', imageKey: 'garlic_rice', category: 'Rice', rating: 4.9, time: '20m', ingredients: CATEGORY_INGREDIENTS.Rice },
   { id: '3', name: 'Beef Pares', imageKey: 'beefpares', category: 'Meat', rating: 4.9, time: '2h', ingredients: CATEGORY_INGREDIENTS.Meat },
   { id: '5', name: 'Beef Tapa', imageKey: 'beef_tapa', category: 'Meat', rating: 4.6, time: '20m', ingredients: CATEGORY_INGREDIENTS.Meat },
   { id: '6', name: 'Chicken Adobo', imageKey: 'chickenadobo', category: 'Meat', rating: 4.9, time: '1h', ingredients: CATEGORY_INGREDIENTS.Meat },
-  { id: '7', name: 'Crispy Lechon', imageKey: 'crispy_lechon', category: 'Meat', rating: 5.0, time: '3h', ingredients: CATEGORY_INGREDIENTS.Meat },
-  { id: '8', name: 'Pork Humba', imageKey: 'humba', category: 'Meat', rating: 4.8, time: '1.5h', ingredients: CATEGORY_INGREDIENTS.Meat },
-  { id: '10', name: 'Fried Chicken', imageKey: 'friedchicken', category: 'Meat', rating: 4.7, time: '30m', ingredients: CATEGORY_INGREDIENTS.Meat },
   { id: '9', name: 'Bulalo Soup', imageKey: 'bulalo', category: 'Vegetable', rating: 4.9, time: '2.5h', ingredients: CATEGORY_INGREDIENTS.Vegetable },
   { id: '4', name: 'Binagoongan', imageKey: 'binagoongan', category: 'Vegetable', rating: 4.7, time: '50m', ingredients: CATEGORY_INGREDIENTS.Vegetable },
-  { id: '12', name: 'Side Veggies', imageKey: 'bulalo', category: 'Vegetable', rating: 4.2, time: '10m', ingredients: CATEGORY_INGREDIENTS.Vegetable },
 ];
 
 const FEATURED_DATA = [
   { id: 'f1', title: 'Chicken Adobo', tag: 'Chef Choice', imageKey: 'chickenadobo' },
   { id: 'f2', title: 'Crispy Lechon', tag: 'Trending', imageKey: 'crispy_lechon' },
-  { id: 'f3', title: 'Beef Pares', tag: 'Best Seller', imageKey: 'beefpares' },
 ];
 
 export default function HomeScreen() {
   const router = useRouter();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
+  
+  // --- TASK 1: State Management (Mod 7) ---
+  const [searchQuery, setSearchQuery] = useState(''); // Text Search State
+  const [activeCategory, setActiveCategory] = useState('All'); // Category Filter State
+  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null); // Details Modal State
+  
   const [activeSlide, setActiveSlide] = useState(0);
   const flatListRef = useRef<FlatList>(null);
   const pan = useRef(new Animated.ValueXY()).current;
+
+  // --- TASK 2: State-Driven Filtering Logic ---
+  const filteredData = DATA.filter(item => {
+    const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = activeCategory === 'All' || item.category === activeCategory;
+    return matchesSearch && matchesCategory; // Combined filter
+  });
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -141,63 +113,86 @@ export default function HomeScreen() {
     });
   };
 
-  const renderHorizontalList = (category: 'Rice' | 'Meat' | 'Vegetable') => (
-    <View key={category}>
-      <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>{category} Dishes</Text>
+  const renderHorizontalList = (category: 'Rice' | 'Meat' | 'Vegetable') => {
+    const categoryData = filteredData.filter(r => r.category === category);
+    if (categoryData.length === 0) return null;
+
+    return (
+      <View key={category} style={styles.sectionContainer}>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>{category} Dishes</Text>
+        </View>
+        <FlatList
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          data={categoryData}
+          contentContainerStyle={{ paddingLeft: 20, paddingRight: 10 }}
+          renderItem={({ item }) => (
+            <TouchableOpacity style={styles.recipeCard} onPress={() => setSelectedRecipe(item)}>
+              <View style={styles.imageWrapper}>
+                <Image source={RecipeImages[item.imageKey]} style={styles.thumb} resizeMode="cover" />
+              </View>
+              <Text style={styles.recipeName} numberOfLines={1}>{item.name}</Text>
+              <View style={styles.ratingRow}>
+                <Feather name="star" size={10} color="#FF8C00" />
+                <Text style={styles.ratingText}> {item.rating} • {item.time}</Text>
+              </View>
+            </TouchableOpacity>
+          )}
+        />
       </View>
-      <FlatList
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        data={DATA.filter(r => r.category === category)}
-        contentContainerStyle={{ paddingLeft: 20, paddingRight: 10 }}
-        renderItem={({ item }) => (
-          <TouchableOpacity style={styles.recipeCard} onPress={() => setSelectedRecipe(item)}>
-            <View style={styles.imageWrapper}>
-              <Image source={RecipeImages[item.imageKey]} style={styles.thumb} resizeMode="cover" />
-            </View>
-            <Text style={styles.recipeName} numberOfLines={1}>{item.name}</Text>
-            <View style={styles.ratingRow}>
-              <Feather name="star" size={10} color="#FF8C00" />
-              <Text style={styles.ratingText}> {item.rating} • {item.time}</Text>
-            </View>
-          </TouchableOpacity>
-        )}
-      />
-    </View>
-  );
+    );
+  };
 
   return (
     <SafeAreaView edges={['top']} style={styles.container}>
       <StatusBar barStyle="dark-content" />
-      <SharedHeader searchQuery={searchQuery} onSearchChange={setSearchQuery} />
+      
+      {/* TASK 3: Navigation & Interaction (Shared Props) */}
+      <SharedHeader 
+        searchQuery={searchQuery} 
+        onSearchChange={setSearchQuery}
+        activeCategory={activeCategory}
+        onCategorySelect={setActiveCategory}
+      />
       
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollPadding}>
-        <View style={styles.carouselContainer}>
-          <FlatList
-            ref={flatListRef}
-            data={FEATURED_DATA}
-            horizontal
-            pagingEnabled
-            showsHorizontalScrollIndicator={false}
-            renderItem={({ item }) => (
-              <View style={styles.heroWrapper}>
-                <Image source={RecipeImages[item.imageKey]} style={styles.heroImg} resizeMode="cover" />
-                <View style={styles.heroOverlay}>
-                  <Text style={styles.heroTag}>{item.tag}</Text>
-                  <Text style={styles.heroTitle}>{item.title}</Text>
+        {/* Hide Featured Carousel during search/filter for better focus */}
+        {!searchQuery && activeCategory === 'All' && (
+          <View style={styles.carouselContainer}>
+            <FlatList
+              ref={flatListRef}
+              data={FEATURED_DATA}
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              renderItem={({ item }) => (
+                <View style={styles.heroWrapper}>
+                  <Image source={RecipeImages[item.imageKey]} style={styles.heroImg} resizeMode="cover" />
+                  <View style={styles.heroOverlay}>
+                    <Text style={styles.heroTag}>{item.tag}</Text>
+                    <Text style={styles.heroTitle}>{item.title}</Text>
+                  </View>
                 </View>
-              </View>
-            )}
-          />
-        </View>
+              )}
+            />
+          </View>
+        )}
 
         {renderHorizontalList('Rice')}
         {renderHorizontalList('Meat')}
         {renderHorizontalList('Vegetable')}
+
+        {/* TASK 4: State-Driven Empty State UI */}
+        {filteredData.length === 0 && (
+          <View style={styles.emptyContainer}>
+            <Feather name="search" size={50} color="#DDD" />
+            <Text style={styles.emptyText}>No matches found.</Text>
+          </View>
+        )}
       </ScrollView>
 
-      {/* MODAL WITH SCROLLABLE INGREDIENTS */}
+      {/* DETAILED VIEW MODAL */}
       <Modal transparent visible={!!selectedRecipe} animationType="fade">
         <View style={styles.modalOverlay}>
           <Animated.View style={[styles.modalContent, { transform: [{ translateY: pan.y }] }]}>
@@ -207,34 +202,21 @@ export default function HomeScreen() {
                   <Image source={RecipeImages[selectedRecipe.imageKey]} style={styles.modalHeroImage} />
                   <View style={styles.dragHandle} />
                 </View>
-                
                 <View style={styles.modalScrollBody}>
                   <Text style={styles.modalRecipeTitle}>{selectedRecipe.name}</Text>
-                  
                   <View style={styles.infoStrip}>
                     <Text style={styles.infoText}>⭐ {selectedRecipe.rating}</Text>
                     <Text style={styles.infoText}>🕒 {selectedRecipe.time}</Text>
-                    <Text style={styles.infoText}>🔥 Easy</Text>
                   </View>
-
                   <Text style={styles.subtitle}>Ingredients List</Text>
-                  
-                  {/* SCROLLABLE AREA */}
-                  <ScrollView 
-                    style={styles.ingScrollView} 
-                    showsVerticalScrollIndicator={true}
-                    nestedScrollEnabled={true}
-                  >
+                  <ScrollView style={styles.ingScrollView} nestedScrollEnabled={true}>
                     {selectedRecipe.ingredients.map((ing, i) => (
                       <View key={i} style={styles.ingRow}>
                         <View style={styles.bullet} />
                         <Text style={styles.ingText}>{ing}</Text>
                       </View>
                     ))}
-                    {/* Extra padding to ensure last item is viewable above button */}
-                    <View style={{ height: 20 }} />
                   </ScrollView>
-
                   <TouchableOpacity 
                     style={styles.ctaButton} 
                     onPress={() => { setSelectedRecipe(null); router.push('/cook/cooking'); }}
@@ -260,28 +242,31 @@ const styles = StyleSheet.create({
   heroOverlay: { position: 'absolute', bottom: 20, left: 20 },
   heroTag: { color: '#FF8C00', fontWeight: '800', fontSize: 12 },
   heroTitle: { color: '#FFF', fontSize: 26, fontWeight: '900' },
-  sectionHeader: { paddingHorizontal: 20, marginTop: 25, marginBottom: 15 },
-  sectionTitle: { fontSize: 22, fontWeight: '900', color: '#1A1A1A' },
+  sectionContainer: { marginBottom: 10 },
+  sectionHeader: { paddingHorizontal: 20, marginTop: 20, marginBottom: 10 },
+  sectionTitle: { fontSize: 20, fontWeight: '900', color: '#1A1A1A' },
   recipeCard: { marginRight: 15, width: 160, backgroundColor: '#FFF', borderRadius: 25, padding: 10, elevation: 4 },
   imageWrapper: { borderRadius: 20, overflow: 'hidden', marginBottom: 10 },
   thumb: { width: '100%', height: 110 },
-  recipeName: { fontSize: 15, fontWeight: '800', color: '#333' },
+  recipeName: { fontSize: 14, fontWeight: '800', color: '#333' },
   ratingRow: { flexDirection: 'row', alignItems: 'center', marginTop: 5 },
-  ratingText: { fontSize: 12, color: '#888' },
+  ratingText: { fontSize: 11, color: '#888' },
+  emptyContainer: { alignItems: 'center', marginTop: 80 },
+  emptyText: { color: '#999', fontSize: 16, marginTop: 10 },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' },
   modalContent: { backgroundColor: '#FFF', borderTopLeftRadius: 40, borderTopRightRadius: 40, height: height * 0.85 },
   modalImageWrapper: { width: '100%', height: 280 },
   modalHeroImage: { width: '100%', height: '100%' },
   dragHandle: { position: 'absolute', top: 15, alignSelf: 'center', width: 50, height: 6, backgroundColor: 'rgba(255,255,255,0.7)', borderRadius: 10 },
   modalScrollBody: { padding: 25, flex: 1 },
-  modalRecipeTitle: { fontSize: 28, fontWeight: '900', color: '#1A1A1A' },
+  modalRecipeTitle: { fontSize: 28, fontWeight: '900' },
   infoStrip: { flexDirection: 'row', marginTop: 10, gap: 15 },
   infoText: { color: '#888', fontWeight: '600' },
-  subtitle: { fontSize: 18, fontWeight: '800', marginTop: 20, marginBottom: 15, color: '#333' },
-  ingScrollView: { flex: 1, marginBottom: 10 },
-  ingRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
+  subtitle: { fontSize: 18, fontWeight: '800', marginTop: 20, marginBottom: 10 },
+  ingScrollView: { flex: 1, marginBottom: 15 },
+  ingRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
   bullet: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#FF8C00', marginRight: 10 },
-  ingText: { fontSize: 16, color: '#555', lineHeight: 22 },
+  ingText: { fontSize: 15, color: '#555' },
   ctaButton: { backgroundColor: '#FF8C00', height: 60, borderRadius: 20, justifyContent: 'center', alignItems: 'center' },
   ctaText: { color: '#FFF', fontSize: 18, fontWeight: '900' },
 });
