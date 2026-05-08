@@ -58,6 +58,7 @@ const DATA: Recipe[] = [
   { id: '6', name: 'Chicken Adobo', imageKey: 'chickenadobo', category: 'Meat', rating: 4.9, time: '1h', ingredients: CATEGORY_INGREDIENTS.Meat },
   { id: '9', name: 'Bulalo Soup', imageKey: 'bulalo', category: 'Vegetable', rating: 4.9, time: '2.5h', ingredients: CATEGORY_INGREDIENTS.Vegetable },
   { id: '4', name: 'Binagoongan', imageKey: 'binagoongan', category: 'Vegetable', rating: 4.7, time: '50m', ingredients: CATEGORY_INGREDIENTS.Vegetable },
+  { id: '7', name: 'Crispy Lechon', imageKey: 'crispy_lechon', category: 'Meat', rating: 5.0, time: '3h', ingredients: CATEGORY_INGREDIENTS.Meat },
 ];
 
 const FEATURED_DATA = [
