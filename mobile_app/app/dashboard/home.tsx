@@ -4,6 +4,30 @@ import {
   FlatList, SafeAreaView, ActivityIndicator, Alert, TouchableOpacity 
 } from 'react-native';
 import { SharedHeader } from '../../components/SharedHeader';
+import { Feather } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+
+const { width, height } = Dimensions.get('window');
+
+// --- IMAGE MAPPER ---
+const RecipeImages: { [key: string]: any } = {
+  arroz_caldo: require('../../assets/images/arroz_caldo.png'),
+  beef_tapa: require('../../assets/images/beef_tapa.png'),
+  beefpares: require('../../assets/images/beefpares.png'),
+  binagoongan: require('../../assets/images/binagoongan.png'),
+  bulalo: require('../../assets/images/bulalo.png'),
+  chickenadobo: require('../../assets/images/chickenadobo.png'),
+  crispy_lechon: require('../../assets/images/crispy_lechon.png'),
+  friedchicken: require('../../assets/images/friedchicken.png'),
+  garlic_rice: require('../../assets/images/garlic_rice.png'),
+  humba: require('../../assets/images/humba.png'),
+};
+
+const CATEGORY_INGREDIENTS = {
+  Rice: ['4 cups Cooked Rice', '6 cloves Minced Garlic', '2 tbsp Cooking Oil', '1 tsp Salt'],
+  Meat: ['500g Choice of Meat', '1/2 cup Soy Sauce', '1/4 cup Vinegar', '4 cloves Garlic'],
+  Vegetable: ['2 cups Chopped Vegetables', '1 pc Onion', '2 cloves Garlic', '1 tbsp Ginger']
+};
 
 interface Recipe {
   id: number;
@@ -116,6 +140,44 @@ export default function HomeScreen() {
           <Text>Demo Add Recipe (Task 4)</Text>
         </TouchableOpacity>
       </ScrollView>
+
+      {/* DETAILED VIEW MODAL */}
+      <Modal transparent visible={!!selectedRecipe} animationType="fade">
+        <View style={styles.modalOverlay}>
+          <Animated.View style={[styles.modalContent, { transform: [{ translateY: pan.y }] }]}>
+            {selectedRecipe && (
+              <>
+                <View style={styles.modalImageWrapper} {...panResponder.panHandlers}>
+                  <Image source={RecipeImages[selectedRecipe.imageKey]} style={styles.modalHeroImage} />
+                  <View style={styles.dragHandle} />
+                </View>
+                <View style={styles.modalScrollBody}>
+                  <Text style={styles.modalRecipeTitle}>{selectedRecipe.name}</Text>
+                  <View style={styles.infoStrip}>
+                    <Text style={styles.infoText}>⭐ {selectedRecipe.rating}</Text>
+                    <Text style={styles.infoText}>🕒 {selectedRecipe.time}</Text>
+                  </View>
+                  <Text style={styles.subtitle}>Ingredients List</Text>
+                  <ScrollView style={styles.ingScrollView} nestedScrollEnabled={true}>
+                    {selectedRecipe.ingredients.map((ing, i) => (
+                      <View key={i} style={styles.ingRow}>
+                        <View style={styles.bullet} />
+                        <Text style={styles.ingText}>{ing}</Text>
+                      </View>
+                    ))}
+                  </ScrollView>
+                  <TouchableOpacity 
+                    style={styles.ctaButton} 
+                    onPress={() => { setSelectedRecipe(null); router.push('/cook/cooking'); }}
+                  >
+                    <Text style={styles.ctaText}>Start Cooking</Text>
+                  </TouchableOpacity>
+                </View>
+              </>
+            )}
+          </Animated.View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }

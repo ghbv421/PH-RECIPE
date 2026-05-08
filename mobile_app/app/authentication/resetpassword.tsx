@@ -5,50 +5,65 @@ import {
   View, 
   TextInput, 
   TouchableOpacity, 
-  SafeAreaView 
+  SafeAreaView,
+  ViewStyle,
+  TextStyle,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 
 export default function ResetPasswordScreen() {
   const router = useRouter();
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.card}>
-        
-        {/* Header with Blue Underline */}
-        <View style={styles.headerUnderline}>
-          <Text style={styles.headerTitle}>Reset Password</Text>
-        </View>
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1 }}
+      >
+        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+          
+          <View style={styles.headerSection}>
+            <Text style={styles.brandText}>PH <Text style={{ color: '#333' }}>RECIPE</Text></Text>
+            <Text style={styles.headerSubtitle}>Don't worry! Enter your email to recover your account.</Text>
+          </View>
 
-        {/* Email Input */}
-        <Text style={styles.label}>Email:</Text>
-        <View style={styles.inputContainer}>
-          <MaterialCommunityIcons name="email" size={24} color="black" style={styles.icon} />
-          <TextInput 
-            placeholder="Enter your email" 
-            style={styles.input}
-            placeholderTextColor="#888"
-            keyboardType="email-address"
-          />
-        </View>
+          <View style={styles.card}>
+            <Text style={styles.title}>Reset Password</Text>
 
-        <TouchableOpacity 
-        style={styles.sendButton}
-        onPress={() => router.push('/authentication/verification')}
-        >
-        <Text style={styles.sendButtonText}>Send Code</Text>
-        </TouchableOpacity>
+            {/* Email Input */}
+            <Text style={styles.label}>Email Address</Text>
+            <View style={styles.inputWrapper}>
+              <Feather name="mail" size={18} color="#999" style={styles.icon} />
+              <TextInput 
+                placeholder="email@example.com" 
+                keyboardType="email-address"
+                autoCapitalize="none"
+                style={styles.input}
+                placeholderTextColor="#BBB"
+              />
+            </View>
 
-        {/* Footer Navigation */}
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>Remember your password? </Text>
-          <TouchableOpacity onPress={() => router.push('/authentication/login')}>
-            <Text style={styles.signInLink}>Sign In</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+            <TouchableOpacity 
+              activeOpacity={0.8}
+              style={styles.sendButton}
+              onPress={() => router.push('/authentication/verification')}
+            >
+              <Text style={styles.sendButtonText}>Send Code</Text>
+            </TouchableOpacity>
+
+            <View style={styles.footer}>
+              <Text style={styles.footerText}>Remember your password? </Text>
+              <TouchableOpacity onPress={() => router.push('/authentication/login')}>
+                <Text style={styles.signInLink}>Sign In</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -56,84 +71,106 @@ export default function ResetPasswordScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFDAB9', // Peach Background
+    backgroundColor: '#FDF7F0', // Consistent Light Cream
+  } as ViewStyle,
+  scrollContent: {
+    flexGrow: 1,
     justifyContent: 'center',
+    padding: 25,
+  } as ViewStyle,
+  headerSection: {
+    marginBottom: 40,
+    alignItems: 'center',
+  } as ViewStyle,
+  brandText: {
+    fontSize: 42,
+    fontWeight: '900',
+    color: '#FF8C00',
+    letterSpacing: -2,
+  } as TextStyle,
+  headerSubtitle: {
+    fontSize: 14,
+    color: '#888',
+    marginTop: 8,
+    textAlign: 'center',
+    lineHeight: 20,
     paddingHorizontal: 20,
-  },
+  } as TextStyle,
   card: {
-    backgroundColor: '#FFB347', // Warm Orange Card
-    borderRadius: 30,
-    padding: 30,
-    paddingVertical: 60,
-    elevation: 8,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    padding: 24,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 10,
-  },
-  headerUnderline: {
-    alignSelf: 'center',
-    borderBottomWidth: 3,
-    borderBottomColor: '#0047AB', // Blue underline to match the design
-    marginBottom: 50,
-  },
-  headerTitle: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#000',
-    fontFamily: 'serif',
-    paddingBottom: 2,
-  },
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.05,
+    shadowRadius: 20,
+    elevation: 4,
+  } as ViewStyle,
+  title: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: '#333',
+    marginBottom: 25,
+    textAlign: 'center',
+  } as TextStyle,
   label: {
-    fontSize: 20,
-    marginBottom: 10,
-    fontFamily: 'serif',
-    fontWeight: '600',
-  },
-  inputContainer: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#444',
+    marginBottom: 8,
+    marginLeft: 4,
+    textTransform: 'uppercase',
+  } as TextStyle,
+  inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFDAB9', // Lighter peach for input
+    backgroundColor: '#F8F8F8',
     borderRadius: 12,
     paddingHorizontal: 15,
-    marginBottom: 45,
-    height: 55,
-  },
+    marginBottom: 30,
+    height: 56,
+    borderWidth: 1,
+    borderColor: '#EEE',
+  } as ViewStyle,
   icon: {
-    marginRight: 10,
-  },
+    marginRight: 12,
+  } as TextStyle,
   input: {
     flex: 1,
     fontSize: 16,
-    fontFamily: 'serif',
-  },
+    color: '#333',
+  } as TextStyle,
   sendButton: {
-    backgroundColor: '#FF7F00', // Solid Orange Button
-    paddingVertical: 14,
-    borderRadius: 15,
+    backgroundColor: '#FF8C00',
+    height: 56,
+    borderRadius: 16,
     alignItems: 'center',
-    marginBottom: 30,
-  },
+    justifyContent: 'center',
+    shadowColor: '#FF8C00',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
+    marginBottom: 20,
+  } as ViewStyle,
   sendButtonText: {
-    color: '#000',
-    fontSize: 26,
-    fontWeight: 'bold',
-    fontFamily: 'serif',
-  },
+    color: '#FFF',
+    fontSize: 18,
+    fontWeight: '700',
+  } as TextStyle,
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-  },
+    marginTop: 10,
+  } as ViewStyle,
   footerText: {
-    fontFamily: 'serif',
-    fontSize: 16,
-  },
+    color: '#777',
+    fontSize: 15,
+  } as TextStyle,
   signInLink: {
-    color: '#FFFFFF',
-    fontWeight: 'bold',
-    fontFamily: 'serif',
-    fontSize: 16,
-    textDecorationLine: 'underline',
-  },
+    color: '#FF8C00',
+    fontWeight: '700',
+    fontSize: 15,
+  } as TextStyle,
 });
