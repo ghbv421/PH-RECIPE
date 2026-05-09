@@ -93,7 +93,7 @@ export default function HomeScreen() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [favorites, setFavorites] = useState<(string | number)[]>([]);
   const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false); // New state for refresh
+  const [refreshing, setRefreshing] = useState(false); // Reload state
   const [error, setError] = useState<string | null>(null);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   
@@ -114,7 +114,7 @@ export default function HomeScreen() {
     })
   ).current;
 
-  // Function to fetch all data
+  // Reusable fetch logic for initial load and pull-to-refresh
   const fetchData = async () => {
     try {
       const savedFavs = await AsyncStorage.getItem('user_favorites');
@@ -125,7 +125,7 @@ export default function HomeScreen() {
         fetch(`${BASE_URL}/recipes/`)
       ]);
 
-      if (!catRes.ok || !recipeRes.ok) throw new Error(`Server connection failed`);
+      if (!catRes.ok || !recipeRes.ok) throw new Error("Server communication error");
 
       const catData = await catRes.json();
       const recipeData = await recipeRes.json();
@@ -134,7 +134,7 @@ export default function HomeScreen() {
       setRecipes(recipeData);
       setError(null);
     } catch (err) {
-      setError('Connection failed. Please check your network or server.');
+      setError('Connection failed. Drag down to try again.');
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -145,7 +145,6 @@ export default function HomeScreen() {
     fetchData();
   }, []);
 
-  // Triggered when user pulls down
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     fetchData();
@@ -206,8 +205,8 @@ export default function HomeScreen() {
           <RefreshControl 
             refreshing={refreshing} 
             onRefresh={onRefresh} 
-            colors={['#FF8C00']} // Android
-            tintColor={'#FF8C00'} // iOS
+            colors={['#FF8C00']} 
+            tintColor={'#FF8C00'}
           />
         }
       >
@@ -217,10 +216,9 @@ export default function HomeScreen() {
         </View>
 
         {error && (
-            <View style={styles.miniError}>
-                <Text style={styles.errorText}>{error}</Text>
-                <TouchableOpacity onPress={onRefresh}><Text style={styles.retryText}>Tap to Retry</Text></TouchableOpacity>
-            </View>
+          <View style={styles.errorBanner}>
+            <Text style={styles.errorText}>{error}</Text>
+          </View>
         )}
 
         <ScrollView 
@@ -298,7 +296,7 @@ export default function HomeScreen() {
                   </TouchableOpacity>
                 </View>
                 
-                <View style={styles.modalScrollBody}>
+                <div style={styles.modalScrollBody}>
                   <Text style={styles.modalRecipeTitle}>{selectedRecipe.name}</Text>
                   <View style={styles.infoStrip}>
                     <Text style={styles.infoText}>⭐ {selectedRecipe.rating}</Text>
@@ -317,7 +315,7 @@ export default function HomeScreen() {
                   <TouchableOpacity style={styles.ctaButton} onPress={() => setSelectedRecipe(null)}>
                     <Text style={styles.ctaText}>Back to Recipes</Text>
                   </TouchableOpacity>
-                </View>
+                </div>
               </>
             )}
           </Animated.View>
@@ -333,9 +331,8 @@ const styles = StyleSheet.create({
   mainTitle: { fontSize: 26, fontWeight: '900', color: '#333' } as TextStyle,
   subTitle: { fontSize: 14, color: '#888', fontWeight: '500', marginTop: 2 } as TextStyle,
   scrollPadding: { paddingBottom: 40 },
-  miniError: { marginHorizontal: 20, padding: 10, backgroundColor: '#FFEBEB', borderRadius: 10, marginBottom: 15, alignItems: 'center' },
-  errorText: { color: '#D32F2F', fontSize: 12, fontWeight: 'bold' },
-  retryText: { color: '#FF8C00', fontSize: 12, fontWeight: '800', marginTop: 4 },
+  errorBanner: { backgroundColor: '#FFEBEB', margin: 20, padding: 10, borderRadius: 10, alignItems: 'center' },
+  errorText: { color: '#D32F2F', fontWeight: 'bold', fontSize: 12 },
   categoryContainer: { paddingLeft: 20, marginBottom: 20, height: 50, alignItems: 'center' },
   categoryPill: { paddingHorizontal: 20, paddingVertical: 8, borderRadius: 20, backgroundColor: '#FFF', marginRight: 10, borderWidth: 1, borderColor: '#EEE', height: 38, justifyContent: 'center' },
   categoryPillActive: { backgroundColor: '#FF8C00', borderColor: '#FF8C00' },
