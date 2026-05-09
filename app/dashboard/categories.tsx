@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   StyleSheet, 
   Text, 
@@ -6,11 +6,11 @@ import {
   FlatList, 
   ImageBackground, 
   TouchableOpacity, 
+  ActivityIndicator,
   Dimensions,
   ViewStyle,
   TextStyle,
-  ImageStyle,
-  ImageSourcePropType // Added for local asset typing
+  ImageStyle
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { SharedHeader } from '../../components/SharedHeader';
@@ -18,73 +18,86 @@ import { Feather } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
 
-// UPDATED: image type to accept both required assets and URI strings
+// API Configuration
+const IP_ADDRESS = '192.168.1.35'; 
+const BASE_URL = `http://${IP_ADDRESS}:8000/api`;
+
+/**
+ * FIXED MAPPING:
+ * These keys now match exactly what is shown in your Django Admin screenshot.
+ */
+const CategoryImages: { [key: string]: any } = {
+  binagoongan: require('../../assets/images/binagoongan.png'),
+  humba: require('../../assets/images/humba.png'),
+  arroz_caldo: require('../../assets/images/arroz_caldo.png'),
+  // Add others as you create them in Admin
+  default_category: require('../../assets/images/garlic_rice.png'),
+};
+
 interface Category { 
-  id: string; 
-  title: string; 
-  image: ImageSourcePropType; 
-  count: string; 
+  id: string | number; 
+  name: string;      
+  image_key: string; 
+  recipe_count?: number; 
 }
 
-const CATEGORIES: Category[] = [
-  { 
-    id: '1', 
-    title: 'Rice Dishes', 
-    image: require('../../assets/images/garlic_rice.png'), // UPDATED to local asset
-    count: '12 Recipes' 
-  },
-  { 
-    id: '2', 
-    title: 'Meat & Poultry', 
-    image: { uri: 'https://images.unsplash.com/photo-1544025162-d76694265947' }, 
-    count: '25 Recipes' 
-  },
-  { 
-    id: '3', 
-    title: 'Fresh Seafood', 
-    image: { uri: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2' }, 
-    count: '18 Recipes' 
-  },
-  { 
-    id: '4', 
-    title: 'Vegetables', 
-    image: { uri: 'https://images.unsplash.com/photo-1540420773420-3366772f4999' }, 
-    count: '15 Recipes' 
-  },
-  { 
-    id: '5', 
-    title: 'Sweet Desserts', 
-    image: { uri: 'https://images.unsplash.com/photo-1551024601-bec78aea704b' }, 
-    count: '10 Recipes' 
-  },
-  { 
-    id: '6', 
-    title: 'Cold Drinks', 
-    image: { uri: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd' }, 
-    count: '8 Recipes' 
-  },
-];
-
 export default function CategoriesScreen() {
-  const renderItem = ({ item }: { item: Category }) => (
-    <TouchableOpacity activeOpacity={0.9} style={styles.card}>
-      <ImageBackground 
-        source={item.image} // UPDATED: source passed directly
-        style={styles.imageBg} 
-        imageStyle={{ borderRadius: 25 }}
-      >
-        {/* Dark overlay to make text pop */}
-        <View style={styles.overlay}>
-          <View>
-            <Text style={styles.cardTitle}>{item.title}</Text>
-            <Text style={styles.recipeCount}>{item.count}</Text>
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch(`${BASE_URL}/categories/`)
+      .then((res) => {
+        if (!res.ok) throw new Error(`Server Error: ${res.status}`);
+        return res.json();
+      })
+      .then((data) => {
+        setCategories(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Fetch Error:", err);
+        setError('Could not load categories.');
+        setLoading(false);
+      });
+  }, []);
+
+  const renderItem = ({ item }: { item: Category }) => {
+    // Clean the key just in case you add .png in Admin later
+    const cleanedKey = item.image_key?.replace('.png', '').replace('.jpg', '').trim();
+    
+    // Look up the image using the cleaned key
+    const imageSource = CategoryImages[cleanedKey] || { uri: 'https://placehold.co/400x400.png' };
+
+    return (
+      <TouchableOpacity activeOpacity={0.9} style={styles.card}>
+        <ImageBackground 
+          source={imageSource} 
+          style={styles.imageBg} 
+          imageStyle={{ borderRadius: 25 }}
+        >
+          <View style={styles.overlay}>
+            <View>
+              <Text style={styles.cardTitle}>{item.name}</Text>
+              <Text style={styles.recipeCount}>
+                {item.recipe_count ?? 0} Recipes
+              </Text>
+            </View>
+            <View style={styles.iconCircle}>
+              <Feather name="arrow-right" size={14} color="#FF8C00" />
+            </View>
           </View>
-          <View style={styles.iconCircle}>
-            <Feather name="arrow-right" size={14} color="#FF8C00" />
-          </View>
-        </View>
-      </ImageBackground>
-    </TouchableOpacity>
+        </ImageBackground>
+      </TouchableOpacity>
+    );
+  };
+
+  if (loading) return (
+    <SafeAreaView style={styles.container}>
+      <SharedHeader />
+      <ActivityIndicator size="large" color="#FF8C00" style={{ flex: 1 }} />
+    </SafeAreaView>
   );
 
   return (
@@ -95,15 +108,21 @@ export default function CategoriesScreen() {
         <Text style={styles.subTitle}>What are you craving today?</Text>
       </View>
 
-      <FlatList
-        data={CATEGORIES}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        numColumns={2}
-        columnWrapperStyle={styles.row}
-        contentContainerStyle={styles.listPadding}
-        showsVerticalScrollIndicator={false}
-      />
+      {error ? (
+        <View style={styles.errorBox}>
+          <Text style={styles.errorText}>{error}</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={categories}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id.toString()}
+          numColumns={2}
+          columnWrapperStyle={styles.row}
+          contentContainerStyle={styles.listPadding}
+          showsVerticalScrollIndicator={false}
+        />
+      )}
     </SafeAreaView>
   );
 }
@@ -145,7 +164,6 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 10,
-    // Fix for Android shadow + borderRadius
     backgroundColor: 'transparent',
   } as ViewStyle,
   imageBg: { 
@@ -154,7 +172,7 @@ const styles = StyleSheet.create({
   } as ImageStyle,
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)', // Slightly darker to ensure white text is readable over Garlic Rice
+    backgroundColor: 'rgba(0,0,0,0.3)', 
     borderRadius: 25,
     padding: 15,
     justifyContent: 'space-between',
@@ -163,9 +181,6 @@ const styles = StyleSheet.create({
     fontSize: 18, 
     fontWeight: '800', 
     color: 'white',
-    textShadowColor: 'rgba(0, 0, 0, 0.5)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 3,
   } as TextStyle,
   recipeCount: {
     fontSize: 11,
@@ -182,4 +197,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignSelf: 'flex-end',
   } as ViewStyle,
+  errorBox: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
+  } as ViewStyle,
+  errorText: {
+    color: '#D32F2F',
+    fontWeight: 'bold'
+  } as TextStyle,
 });
