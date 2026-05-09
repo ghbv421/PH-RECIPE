@@ -6,9 +6,12 @@ import {
   ImageBackground, ViewStyle, TextStyle, ImageStyle
 } from 'react-native';
 import { SharedHeader } from '../../components/SharedHeader';
+import { AntDesign } from '@expo/vector-icons'; 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width, height } = Dimensions.get('window');
 
+// --- CONFIG ---
 const IP_ADDRESS = '192.168.1.35'; 
 const BASE_URL = `http://${IP_ADDRESS}:8000/api`;
 
@@ -25,34 +28,54 @@ const RecipeImages: { [key: string]: any } = {
   humba: require('../../assets/images/humba.png'),
 };
 
+interface Category {
+  id: number;
+  name: string;
+}
+
 interface Recipe {
   id: string | number;
   name: string;
   image_key: string; 
-  category: any; // Can be string or object depending on Serializer
+  category: any;
   time: string;
   rating: number;
-  ingredients?: string; // Django TextField comes as a string
+  ingredients?: string;
 }
 
-const RecipeItem = ({ item, onPress }: { item: Recipe; onPress: () => void; }) => {
+const RecipeItem = ({ 
+  item, 
+  onPress, 
+  isFavorite, 
+  onToggleFavorite 
+}: { 
+  item: Recipe; 
+  onPress: () => void; 
+  isFavorite: boolean; 
+  onToggleFavorite: () => void;
+}) => {
   const cleanedKey = item.image_key ? item.image_key.replace('.png', '').replace('.jpg', '') : 'arroz_caldo';
   const imageSource = RecipeImages[cleanedKey] || { uri: 'https://placehold.co/100x100.png' };
-  
-  // Handle if category is an object {id, name} or just a string
   const categoryName = typeof item.category === 'object' ? item.category.name : item.category;
 
   return (
     <TouchableOpacity activeOpacity={0.9} style={styles.recipeCard} onPress={onPress}>
-      <ImageBackground 
-        source={imageSource} 
-        style={styles.imageBg} 
-        imageStyle={{ borderRadius: 20 }}
-      >
+      <ImageBackground source={imageSource} style={styles.imageBg} imageStyle={{ borderRadius: 20 }}>
         <View style={styles.cardOverlay}>
-          <View style={styles.ratingBadge}>
-            <Text style={styles.ratingText}>⭐ {item.rating}</Text>
+          <View style={styles.cardHeaderRow}>
+            <View style={styles.ratingBadge}>
+              <Text style={styles.ratingText}>⭐ {item.rating}</Text>
+            </View>
+            
+            <TouchableOpacity style={styles.heartCircle} onPress={onToggleFavorite}>
+              <AntDesign 
+                name={(isFavorite ? "heart" : "hearto") as any} 
+                size={16} 
+                color={isFavorite ? "#FF4444" : "#FFF"} 
+              />
+            </TouchableOpacity>
           </View>
+
           <View>
             <Text style={styles.cardRecipeName} numberOfLines={1}>{item.name}</Text>
             <Text style={styles.cardRecipeTime}>{item.time} • {categoryName}</Text>
@@ -65,9 +88,13 @@ const RecipeItem = ({ item, onPress }: { item: Recipe; onPress: () => void; }) =
 
 export default function HomeScreen() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [favorites, setFavorites] = useState<(string | number)[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
+  
   const pan = useRef(new Animated.ValueXY()).current;
 
   const panResponder = useRef(
@@ -86,25 +113,78 @@ export default function HomeScreen() {
   ).current;
 
   useEffect(() => {
-    fetch(`${BASE_URL}/recipes/`)
-      .then((res) => {
+    const initData = async () => {
+      try {
+        const savedFavs = await AsyncStorage.getItem('user_favorites');
+        if (savedFavs) setFavorites(JSON.parse(savedFavs));
+
+        const catRes = await fetch(`${BASE_URL}/categories/`);
+        const catData = await catRes.json();
+        setCategories([{ id: 0, name: 'All' }, ...catData]);
+
+        const res = await fetch(`${BASE_URL}/recipes/`);
         if (!res.ok) throw new Error(`Server Error: ${res.status}`);
-        return res.json();
-      })
-      .then((data) => {
+        const data = await res.json();
         setRecipes(data);
+      } catch (err) {
+        setError('Connection failed. Check your Django server.');
+      } finally {
         setLoading(false);
-      })
-      .catch((err) => {
-        setError('Connection failed. Is your Django server running?');
-        setLoading(false);
-      });
+      }
+    };
+    initData();
   }, []);
 
-  // Helper to turn the Django TextField string into an array
+  const toggleFavorite = async (id: string | number) => {
+    try {
+      let newFavs = favorites.includes(id) 
+        ? favorites.filter(favId => favId !== id) 
+        : [...favorites, id];
+      setFavorites(newFavs);
+      await AsyncStorage.setItem('user_favorites', JSON.stringify(newFavs));
+    } catch (e) {
+      console.error("Error saving favorite:", e);
+    }
+  };
+
+  // --- NEW: RECENTLY VIEWED LOGIC ---
+  const addToRecentlyViewed = async (recipe: Recipe) => {
+    try {
+      const storedRecent = await AsyncStorage.getItem('recently_viewed');
+      let recentList: (string | number)[] = storedRecent ? JSON.parse(storedRecent) : [];
+
+      // Remove the ID if it already exists (to move it to the front)
+      recentList = recentList.filter(id => id !== recipe.id);
+
+      // Add to the beginning of the array
+      recentList.unshift(recipe.id);
+
+      // Keep only the last 10 items
+      if (recentList.length > 10) {
+        recentList = recentList.slice(0, 10);
+      }
+
+      await AsyncStorage.setItem('recently_viewed', JSON.stringify(recentList));
+    } catch (e) {
+      console.error("Error saving recently viewed:", e);
+    }
+  };
+
+  const handleRecipePress = (recipe: Recipe) => {
+    pan.setValue({ x: 0, y: 0 });
+    setSelectedRecipe(recipe);
+    addToRecentlyViewed(recipe); // Save to recently viewed when clicked
+  };
+
+  const filteredRecipes = selectedCategory === 'All' 
+    ? recipes 
+    : recipes.filter(recipe => {
+        const catName = typeof recipe.category === 'object' ? recipe.category.name : recipe.category;
+        return catName === selectedCategory;
+      });
+
   const getIngredientsList = (ingData: string | undefined) => {
     if (!ingData) return [];
-    // Splits by comma OR newline and trims whitespace
     return ingData.split(/[,\n]+/).map(item => item.trim()).filter(item => item !== "");
   };
 
@@ -120,6 +200,30 @@ export default function HomeScreen() {
           <Text style={styles.subTitle}>Authentic Filipino Flavors</Text>
         </View>
 
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false} 
+          contentContainerStyle={styles.categoryContainer}
+        >
+          {categories.map((cat) => (
+            <TouchableOpacity
+              key={cat.id}
+              onPress={() => setSelectedCategory(cat.name)}
+              style={[
+                styles.categoryPill,
+                selectedCategory === cat.name && styles.categoryPillActive
+              ]}
+            >
+              <Text style={[
+                styles.categoryText,
+                selectedCategory === cat.name && styles.categoryTextActive
+              ]}>
+                {cat.name}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+
         <View style={styles.heroWrapper}>
           <Image source={{ uri: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c' }} style={styles.heroImg} />
           <View style={styles.heroOverlay}>
@@ -127,27 +231,27 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        <Text style={styles.sectionTitle}>Recently Added</Text>
+        <Text style={styles.sectionTitle}>
+          {selectedCategory === 'All' ? 'Recently Added' : `${selectedCategory} Recipes`}
+        </Text>
 
         <FlatList
           horizontal
           showsHorizontalScrollIndicator={false}
-          data={recipes}
+          data={filteredRecipes}
           keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={{ paddingLeft: 20, paddingRight: 10 }}
           renderItem={({ item }) => (
             <RecipeItem
               item={item}
-              onPress={() => {
-                pan.setValue({ x: 0, y: 0 });
-                setSelectedRecipe(item);
-              }}
+              isFavorite={favorites.includes(item.id)}
+              onToggleFavorite={() => toggleFavorite(item.id)}
+              onPress={() => handleRecipePress(item)}
             />
           )}
         />
       </ScrollView>
 
-      {/* Detail Modal */}
       <Modal transparent visible={!!selectedRecipe} animationType="fade">
         <View style={styles.modalOverlay}>
           <Animated.View style={[styles.modalContent, { transform: [{ translateY: pan.y }] }]}>
@@ -159,7 +263,18 @@ export default function HomeScreen() {
                     style={styles.modalHeroImage}
                   />
                   <View style={styles.dragHandle} />
+                  <TouchableOpacity 
+                    style={styles.modalHeart} 
+                    onPress={() => toggleFavorite(selectedRecipe.id)}
+                  >
+                    <AntDesign 
+                      name={(favorites.includes(selectedRecipe.id) ? "heart" : "hearto") as any} 
+                      size={24} 
+                      color={favorites.includes(selectedRecipe.id) ? "#FF4444" : "#FFF"} 
+                    />
+                  </TouchableOpacity>
                 </View>
+                
                 <View style={styles.modalScrollBody}>
                   <Text style={styles.modalRecipeTitle}>{selectedRecipe.name}</Text>
                   <View style={styles.infoStrip}>
@@ -169,18 +284,13 @@ export default function HomeScreen() {
                   
                   <Text style={styles.modalSubtitle}>Ingredients List</Text>
                   <ScrollView style={styles.ingScrollView} nestedScrollEnabled>
-                    {getIngredientsList(selectedRecipe.ingredients).length > 0 ? (
-                      getIngredientsList(selectedRecipe.ingredients).map((ing, i) => (
-                        <View key={i} style={styles.ingRow}>
-                          <View style={styles.bullet} />
-                          <Text style={styles.ingText}>{ing}</Text>
-                        </View>
-                      ))
-                    ) : (
-                      <Text style={{color: '#999'}}>No ingredients listed.</Text>
-                    )}
+                    {getIngredientsList(selectedRecipe.ingredients).map((ing, i) => (
+                      <View key={i} style={styles.ingRow}>
+                        <View style={styles.bullet} />
+                        <Text style={styles.ingText}>{ing}</Text>
+                      </View>
+                    ))}
                   </ScrollView>
-                  
                   <TouchableOpacity style={styles.ctaButton} onPress={() => setSelectedRecipe(null)}>
                     <Text style={styles.ctaText}>Back to Recipes</Text>
                   </TouchableOpacity>
@@ -196,11 +306,16 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FDF7F0' } as ViewStyle,
-  headerPadding: { paddingHorizontal: 20, paddingTop: 10, marginBottom: 20 } as ViewStyle,
+  headerPadding: { paddingHorizontal: 20, paddingTop: 10, marginBottom: 10 } as ViewStyle,
   mainTitle: { fontSize: 26, fontWeight: '900', color: '#333' } as TextStyle,
   subTitle: { fontSize: 14, color: '#888', fontWeight: '500', marginTop: 2 } as TextStyle,
   scrollPadding: { paddingBottom: 40 },
-  heroWrapper: { marginHorizontal: 20, height: 180, borderRadius: 25, overflow: 'hidden', marginBottom: 25, elevation: 5 },
+  categoryContainer: { paddingLeft: 20, marginBottom: 20, height: 50, alignItems: 'center' },
+  categoryPill: { paddingHorizontal: 20, paddingVertical: 8, borderRadius: 20, backgroundColor: '#FFF', marginRight: 10, borderWidth: 1, borderColor: '#EEE', height: 38, justifyContent: 'center' },
+  categoryPillActive: { backgroundColor: '#FF8C00', borderColor: '#FF8C00' },
+  categoryText: { color: '#888', fontWeight: '700', fontSize: 13 },
+  categoryTextActive: { color: '#FFF' },
+  heroWrapper: { marginHorizontal: 20, height: 160, borderRadius: 25, overflow: 'hidden', marginBottom: 25, elevation: 5 },
   heroImg: { width: '100%', height: '100%', resizeMode: 'cover' },
   heroOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.3)', justifyContent: 'flex-end', padding: 15 },
   heroText: { color: 'white', fontSize: 18, fontWeight: '800' },
@@ -208,6 +323,8 @@ const styles = StyleSheet.create({
   recipeCard: { width: 160, height: 220, marginRight: 15, elevation: 4, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 10, backgroundColor: 'transparent' } as ViewStyle,
   imageBg: { width: '100%', height: '100%' } as ImageStyle,
   cardOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.35)', borderRadius: 20, padding: 12, justifyContent: 'space-between' } as ViewStyle,
+  cardHeaderRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  heartCircle: { backgroundColor: 'rgba(0,0,0,0.2)', padding: 6, borderRadius: 15 },
   cardRecipeName: { fontSize: 16, fontWeight: '800', color: 'white' } as TextStyle,
   cardRecipeTime: { fontSize: 11, color: 'rgba(255,255,255,0.9)', fontWeight: '600' } as TextStyle,
   ratingBadge: { alignSelf: 'flex-start', backgroundColor: 'rgba(255,255,255,0.9)', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 10 },
@@ -217,7 +334,8 @@ const styles = StyleSheet.create({
   modalImageWrapper: { width: '100%', height: 250, position: 'relative' },
   modalHeroImage: { width: '100%', height: '100%', resizeMode: 'cover' },
   dragHandle: { position: 'absolute', top: 12, alignSelf: 'center', width: 45, height: 5, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.5)' },
-  modalScrollBody: { padding: 25 },
+  modalHeart: { position: 'absolute', right: 20, bottom: -25, backgroundColor: '#FFF', width: 50, height: 50, borderRadius: 25, justifyContent: 'center', alignItems: 'center', elevation: 5 },
+  modalScrollBody: { padding: 25, paddingTop: 35 },
   modalRecipeTitle: { fontSize: 26, fontWeight: '900', color: '#333', marginBottom: 10 },
   infoStrip: { flexDirection: 'row', gap: 15, marginBottom: 20 },
   infoText: { fontSize: 14, color: '#666', fontWeight: '600', backgroundColor: '#FFF', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12, elevation: 1 },
