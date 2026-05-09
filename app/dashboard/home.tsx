@@ -1,9 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import {
   StyleSheet, Text, View, ScrollView, Image,
   FlatList, SafeAreaView, ActivityIndicator,
   TouchableOpacity, Modal, Animated, Dimensions, PanResponder,
-  ImageBackground, ViewStyle, TextStyle, ImageStyle
+  ImageBackground, ViewStyle, TextStyle, ImageStyle,
+  RefreshControl // Added for pull-to-refresh
 } from 'react-native';
 import { SharedHeader } from '../../components/SharedHeader';
 import { AntDesign } from '@expo/vector-icons'; 
@@ -92,6 +93,7 @@ export default function HomeScreen() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [favorites, setFavorites] = useState<(string | number)[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false); // New state for refresh
   const [error, setError] = useState<string | null>(null);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   
@@ -112,27 +114,41 @@ export default function HomeScreen() {
     })
   ).current;
 
+  // Function to fetch all data
+  const fetchData = async () => {
+    try {
+      const savedFavs = await AsyncStorage.getItem('user_favorites');
+      if (savedFavs) setFavorites(JSON.parse(savedFavs));
+
+      const [catRes, recipeRes] = await Promise.all([
+        fetch(`${BASE_URL}/categories/`),
+        fetch(`${BASE_URL}/recipes/`)
+      ]);
+
+      if (!catRes.ok || !recipeRes.ok) throw new Error(`Server connection failed`);
+
+      const catData = await catRes.json();
+      const recipeData = await recipeRes.json();
+
+      setCategories([{ id: 0, name: 'All' }, ...catData]);
+      setRecipes(recipeData);
+      setError(null);
+    } catch (err) {
+      setError('Connection failed. Please check your network or server.');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
   useEffect(() => {
-    const initData = async () => {
-      try {
-        const savedFavs = await AsyncStorage.getItem('user_favorites');
-        if (savedFavs) setFavorites(JSON.parse(savedFavs));
+    fetchData();
+  }, []);
 
-        const catRes = await fetch(`${BASE_URL}/categories/`);
-        const catData = await catRes.json();
-        setCategories([{ id: 0, name: 'All' }, ...catData]);
-
-        const res = await fetch(`${BASE_URL}/recipes/`);
-        if (!res.ok) throw new Error(`Server Error: ${res.status}`);
-        const data = await res.json();
-        setRecipes(data);
-      } catch (err) {
-        setError('Connection failed. Check your Django server.');
-      } finally {
-        setLoading(false);
-      }
-    };
-    initData();
+  // Triggered when user pulls down
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchData();
   }, []);
 
   const toggleFavorite = async (id: string | number) => {
@@ -147,23 +163,13 @@ export default function HomeScreen() {
     }
   };
 
-  // --- NEW: RECENTLY VIEWED LOGIC ---
   const addToRecentlyViewed = async (recipe: Recipe) => {
     try {
       const storedRecent = await AsyncStorage.getItem('recently_viewed');
       let recentList: (string | number)[] = storedRecent ? JSON.parse(storedRecent) : [];
-
-      // Remove the ID if it already exists (to move it to the front)
       recentList = recentList.filter(id => id !== recipe.id);
-
-      // Add to the beginning of the array
       recentList.unshift(recipe.id);
-
-      // Keep only the last 10 items
-      if (recentList.length > 10) {
-        recentList = recentList.slice(0, 10);
-      }
-
+      if (recentList.length > 10) recentList = recentList.slice(0, 10);
       await AsyncStorage.setItem('recently_viewed', JSON.stringify(recentList));
     } catch (e) {
       console.error("Error saving recently viewed:", e);
@@ -173,7 +179,7 @@ export default function HomeScreen() {
   const handleRecipePress = (recipe: Recipe) => {
     pan.setValue({ x: 0, y: 0 });
     setSelectedRecipe(recipe);
-    addToRecentlyViewed(recipe); // Save to recently viewed when clicked
+    addToRecentlyViewed(recipe);
   };
 
   const filteredRecipes = selectedCategory === 'All' 
@@ -188,17 +194,34 @@ export default function HomeScreen() {
     return ingData.split(/[,\n]+/).map(item => item.trim()).filter(item => item !== "");
   };
 
-  if (loading) return <ActivityIndicator size="large" color="#FF8C00" style={{ marginTop: 100 }} />;
-  if (error) return <View style={styles.errorContainer}><Text style={styles.errorText}>{error}</Text></View>;
+  if (loading && !refreshing) return <ActivityIndicator size="large" color="#FF8C00" style={{ marginTop: 100 }} />;
 
   return (
     <SafeAreaView style={styles.container}>
       <SharedHeader />
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollPadding}>
+      <ScrollView 
+        showsVerticalScrollIndicator={false} 
+        contentContainerStyle={styles.scrollPadding}
+        refreshControl={
+          <RefreshControl 
+            refreshing={refreshing} 
+            onRefresh={onRefresh} 
+            colors={['#FF8C00']} // Android
+            tintColor={'#FF8C00'} // iOS
+          />
+        }
+      >
         <View style={styles.headerPadding}>
           <Text style={styles.mainTitle}>Delicious Recipes</Text>
           <Text style={styles.subTitle}>Authentic Filipino Flavors</Text>
         </View>
+
+        {error && (
+            <View style={styles.miniError}>
+                <Text style={styles.errorText}>{error}</Text>
+                <TouchableOpacity onPress={onRefresh}><Text style={styles.retryText}>Tap to Retry</Text></TouchableOpacity>
+            </View>
+        )}
 
         <ScrollView 
           horizontal 
@@ -310,6 +333,9 @@ const styles = StyleSheet.create({
   mainTitle: { fontSize: 26, fontWeight: '900', color: '#333' } as TextStyle,
   subTitle: { fontSize: 14, color: '#888', fontWeight: '500', marginTop: 2 } as TextStyle,
   scrollPadding: { paddingBottom: 40 },
+  miniError: { marginHorizontal: 20, padding: 10, backgroundColor: '#FFEBEB', borderRadius: 10, marginBottom: 15, alignItems: 'center' },
+  errorText: { color: '#D32F2F', fontSize: 12, fontWeight: 'bold' },
+  retryText: { color: '#FF8C00', fontSize: 12, fontWeight: '800', marginTop: 4 },
   categoryContainer: { paddingLeft: 20, marginBottom: 20, height: 50, alignItems: 'center' },
   categoryPill: { paddingHorizontal: 20, paddingVertical: 8, borderRadius: 20, backgroundColor: '#FFF', marginRight: 10, borderWidth: 1, borderColor: '#EEE', height: 38, justifyContent: 'center' },
   categoryPillActive: { backgroundColor: '#FF8C00', borderColor: '#FF8C00' },
@@ -346,6 +372,4 @@ const styles = StyleSheet.create({
   ingText: { fontSize: 15, color: '#444', lineHeight: 20 },
   ctaButton: { backgroundColor: '#FF8C00', borderRadius: 18, paddingVertical: 16, alignItems: 'center', elevation: 3 },
   ctaText: { color: '#fff', fontWeight: '800', fontSize: 16 },
-  errorContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#FDF7F0' },
-  errorText: { color: '#D32F2F', textAlign: 'center', fontWeight: 'bold' },
 });
