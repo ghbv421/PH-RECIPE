@@ -30,7 +30,7 @@ const CategoryImages: { [key: string]: any } = {
   binagoongan: require('../../assets/images/binagoongan.png'),
   humba: require('../../assets/images/humba.png'),
   arroz_caldo: require('../../assets/images/arroz_caldo.png'),
-  beefpares: require('../../assets/images/beefpares.png'),
+  beefpares: require('../../assets/images/beefpares.png'), 
   // Add others as you create them in Admin
   default_category: require('../../assets/images/garlic_rice.png'),
 };
