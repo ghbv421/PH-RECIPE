@@ -1,8 +1,16 @@
+// src/components/Sidebar.jsx
 import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { logout } = useAuth(); // ✅ Real logout from AuthContext
+
+  const handleLogout = () => {
+    logout();           // Clears token from sessionStorage and context
+    navigate("/");      // Redirect to login
+  };
 
   return (
     <aside className="sidebar">
@@ -47,12 +55,12 @@ export default function Sidebar() {
         </ul>
       </div>
 
-{/* Logout Button Section */}
-<div className="logout-container">
-  <button className="logout-button" onClick={() => navigate("/")}>
-    Logout
-  </button>
-</div>
+      {/* ✅ Real logout — clears token and redirects to login */}
+      <div className="logout-container">
+        <button className="logout-button" onClick={handleLogout}>
+          Logout
+        </button>
+      </div>
     </aside>
   );
 }

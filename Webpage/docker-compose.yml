@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  frontend:
+    build: ./Webpage
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+  backend:
+    build: ./PH-RECIPE-BACKEND
+    ports:
+      - "8000:8000"
+    # Add your database environment variables here

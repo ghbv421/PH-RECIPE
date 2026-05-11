@@ -1,4 +1,6 @@
+// src/App.jsx
 import { Routes, Route, Navigate } from "react-router-dom";
+import { useAuth } from "./context/AuthContext";
 
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -11,27 +13,41 @@ import Profile from "./pages/Profile";
 import Recent from "./pages/Recent";
 import Settings from "./pages/Settings";
 
+// ✅ RBAC: Protected route — redirects to login if not authenticated
+function ProtectedRoute({ children, adminOnly = false }) {
+  const { user } = useAuth();
+
+  if (!user) return <Navigate to="/" replace />;
+
+  // ✅ RBAC: If route requires admin, check role
+  if (adminOnly && user.role !== "admin") {
+    return <Navigate to="/home" replace />;
+  }
+
+  return children;
+}
+
 function App() {
+  const { user } = useAuth();
+
   return (
     <Routes>
+      {/* Public routes */}
+      <Route path="/" element={user ? <Navigate to="/home" /> : <Login />} />
+      <Route path="/signup" element={user ? <Navigate to="/home" /> : <Signup />} />
 
-      {/* Default page */}
-      <Route path="/" element={<Login />} />
+      {/* Protected routes — must be logged in */}
+      <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+      <Route path="/category" element={<ProtectedRoute><Category /></ProtectedRoute>} />
+      <Route path="/cooking" element={<ProtectedRoute><Cooking /></ProtectedRoute>} />
+      <Route path="/favorites" element={<ProtectedRoute><Favorites /></ProtectedRoute>} />
+      <Route path="/popular" element={<ProtectedRoute><Popular /></ProtectedRoute>} />
+      <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+      <Route path="/recent" element={<ProtectedRoute><Recent /></ProtectedRoute>} />
+      <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
 
-      {/* Other pages */}
-      <Route path="/signup" element={<Signup />} />
-      <Route path="/home" element={<Home />} />
-      <Route path="/category" element={<Category />} />
-      <Route path="/cooking" element={<Cooking />} />
-      <Route path="/favorites" element={<Favorites />} />
-      <Route path="/popular" element={<Popular />} />
-      <Route path="/profile" element={<Profile />} />
-      <Route path="/recent" element={<Recent />} />
-      <Route path="/settings" element={<Settings />} />
-
-      {/* fallback */}
+      {/* Fallback */}
       <Route path="*" element={<Navigate to="/" />} />
-
     </Routes>
   );
 }

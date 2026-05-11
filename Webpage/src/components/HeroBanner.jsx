@@ -1,53 +1,92 @@
+// src/components/HeroBanner.jsx
+
 import { useState, useEffect } from "react";
-import img1 from "../assets/images/beefpares.svg";
-import img2 from "../assets/images/chickenadobo.svg";
-import img3 from "../assets/images/bulalo.svg";
-import img4 from "../assets/images/friedchicken.svg";
-import img5 from "../assets/images/porkadobo.svg";
+
+const BASE_URL = "http://127.0.0.1:8000";
+
+const getImageUrl = (recipe) => {
+  if (!recipe) return "";
+
+  if (recipe.image && typeof recipe.image === "string") {
+    if (recipe.image.startsWith("http")) return recipe.image;
+
+    const path = recipe.image.startsWith("/")
+      ? recipe.image
+      : `/${recipe.image}`;
+
+    return `${BASE_URL}${path}`;
+  }
+
+  if (recipe.image_key && recipe.image_key !== "...") {
+    const fileName = recipe.image_key.includes(".")
+      ? recipe.image_key
+      : `${recipe.image_key}.png`;
+
+    return `${BASE_URL}/media/images/${fileName}`;
+  }
+
+  return "https://via.placeholder.com/1200x500?text=No+Image";
+};
 
 export default function HeroBanner() {
-  // Data array linking thumbnails to main display content
-  const slides = [
-    {
-      title: "Fried Rice",
-      mainImg: "https://images.unsplash.com/photo-1603133872878-684f208fb84b",
-      thumb: img1
-    },
-    {
-      title: "Beef Pares",
-      mainImg: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c", 
-      thumb: img1
-    },
-    {
-      title: "Chicken Adobo",
-      mainImg: "https://images.unsplash.com/photo-1512058564366-18510be2db19",
-      thumb: img2
-    },
-    {
-      title: "Bulalo",
-      mainImg: "https://images.unsplash.com/photo-1547592166-23ac45744acd",
-      thumb: img3
-    },
-    {
-      title: "Pork Adobo",
-      mainImg: "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d",
-      thumb: img5
-    }
-  ];
-
+  const [slides, setSlides] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Auto-play logic: changes slide every 5 seconds
+  // Fetch first 5 recipes
   useEffect(() => {
+    const fetchRecipes = async () => {
+      try {
+        const res = await fetch(`${BASE_URL}/api/recipes/`);
+        const data = await res.json();
+
+        const formattedSlides = data.slice(0, 5).map((recipe) => ({
+          title: recipe.name,
+          mainImg: getImageUrl(recipe),
+          thumb: getImageUrl(recipe),
+        }));
+
+        setSlides(formattedSlides);
+      } catch (err) {
+        console.error("Failed to load hero recipes:", err);
+      }
+    };
+
+    fetchRecipes();
+  }, []);
+
+  // Auto slide
+  useEffect(() => {
+    if (slides.length === 0) return;
+
     const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % slides.length);
+      setCurrentIndex((prev) => (prev + 1) % slides.length);
     }, 5000);
+
     return () => clearInterval(interval);
-  }, [slides.length]);
+  }, [slides]);
+
+  if (slides.length === 0) {
+    return (
+      <section className="hero">
+        <div
+          style={{
+            height: "450px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "white",
+            fontSize: "24px",
+          }}
+        >
+          Loading recipes...
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="hero">
-      {/* Main Hero Image with a key to trigger CSS animations on change */}
+      {/* Main Image */}
       <img
         key={currentIndex}
         src={slides[currentIndex].mainImg}
@@ -55,24 +94,35 @@ export default function HeroBanner() {
         className="hero-main-img"
       />
 
-      <h1 key={`title-${currentIndex}`}>{slides[currentIndex].title}</h1>
+      {/* Title */}
+      <h1 key={`title-${currentIndex}`}>
+        {slides[currentIndex].title}
+      </h1>
 
+      {/* Thumbnail List */}
       <div className="top-list-wrap">
-        <div className="top-list-label">Hot Top 5 list</div>
+        <div className="top-list-label">Hot Top 5 Recipes</div>
+
         <div className="top-list">
           {slides.map((slide, i) => (
             <img
               key={i}
               src={slide.thumb}
-              alt={`Top ${i + 1}`}
-              onClick={() => setCurrentIndex(i)} // Manual click to change slide
+              alt={slide.title}
+              onClick={() => setCurrentIndex(i)}
               className={currentIndex === i ? "active-thumb" : ""}
               style={{
-                border: currentIndex === i ? "3px solid orange" : "2px solid rgba(255,255,255,0.5)",
-                transform: currentIndex === i ? "scale(1.15)" : "scale(1)",
+                border:
+                  currentIndex === i
+                    ? "3px solid orange"
+                    : "2px solid rgba(255,255,255,0.5)",
+                transform:
+                  currentIndex === i
+                    ? "scale(1.15)"
+                    : "scale(1)",
                 opacity: currentIndex === i ? 1 : 0.7,
                 transition: "all 0.3s ease",
-                cursor: "pointer"
+                cursor: "pointer",
               }}
             />
           ))}

@@ -5,21 +5,20 @@ html, body {
   height: 100%;
   overflow-x: hidden;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #fdfaf5; /* Clean base color */
+  background: #fdfaf5; 
 }
 
 /* --- Layout Structure --- */
 .layout {
   display: flex;
   min-height: 100vh;
-  background: #d9d2c3; /* Theme beige */
+  background: #d9d2c3; 
 }
 
-/* Updated Main: Added padding-top to prevent Header overlap */
 .main {
   flex: 1;
   padding: 30px;
-  padding-top: 100px; /* Offset for the fixed header height */
+  padding-top: 100px; 
   overflow-y: auto;
 }
 
@@ -39,7 +38,7 @@ html, body {
   flex-direction: column;
   justify-content: space-between;
   border-right: 1px solid rgba(0,0,0,0.05);
-  z-index: 1100; /* Stays above the fixed header if needed */
+  z-index: 1100;
 }
 
 .logo {
@@ -107,10 +106,9 @@ html, body {
   border-radius: 24px;
   overflow: hidden;
   box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-  background: #000; /* Background for smoother fades */
+  background: #000;
 }
 
-/* Animation for the carousel image switching */
 .hero img {
   width: 100%;
   height: 450px;
@@ -118,7 +116,6 @@ html, body {
   display: block;
 }
 
-/* Key for triggering fade-in on slide change */
 .hero-main-img {
   animation: heroFade 1.2s ease-in-out;
 }
@@ -147,7 +144,7 @@ html, body {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Glassmorphism for Top List Wrapper (Horizontal) */
+/* Glassmorphism for Top List Wrapper */
 .top-list-wrap {
   position: absolute;
   bottom: 30px;
@@ -196,7 +193,6 @@ html, body {
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
 }
 
-/* Highlight the active slide in the Top 5 list */
 .active-thumb {
   border: 3px solid orange !important;
   transform: scale(1.1);
@@ -249,6 +245,8 @@ html, body {
   box-shadow: 0 8px 20px rgba(0,0,0,0.04);
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .recipe-card:hover {
@@ -256,10 +254,14 @@ html, body {
   box-shadow: 0 15px 30px rgba(0,0,0,0.1);
 }
 
+/* TASK RESOLUTION: Fixed height and object-fit for uniformity */
 .recipe-card img {
   width: 100%;
+  height: 180px; /* Fixed height to match Arroz Caldo card */
   border-radius: 15px;
+  object-fit: cover; /* Ensures images are cropped instead of stretched */
   transition: transform 0.6s ease;
+  display: block;
 }
 
 .recipe-card.tall-card img {
@@ -311,4 +313,376 @@ html, body {
   0% { transform: scale(1); }
   50% { transform: scale(1.4); }
   100% { transform: scale(1.1); }
+}
+
+.add-btn {
+  background: linear-gradient(135deg, #ff8c00 0%, #ff5e00 100%);
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 50px; /* Pill shape */
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(255, 140, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.add-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(255, 140, 0, 0.4);
+}
+
+/* Specific styling for the Cancel state */
+.cancel-btn {
+  background: white !important;
+  color: #ff4757 !important;
+  border: 2px solid #ff4757 !important;
+  padding: 10px 24px;
+  border-radius: 50px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+
+/* =========================
+   ADMIN RECIPE FORM
+========================= */
+
+.admin-entry-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 40px;
+  animation: fadeIn 0.3s ease;
+}
+
+.admin-recipe-form {
+  width: 100%;
+  max-width: 850px;
+  background: white;
+  padding: 35px;
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.form-title {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+  color: #333;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.form-group label {
+  font-weight: 700;
+  color: #444;
+  font-size: 14px;
+}
+
+.admin-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.admin-input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid #ddd;
+  border-radius: 14px;
+  font-size: 15px;
+  outline: none;
+  transition: 0.3s ease;
+  box-sizing: border-box;
+  background: #fafafa;
+}
+
+.admin-input:focus {
+  border-color: orange;
+  background: white;
+  box-shadow: 0 0 0 4px rgba(255, 165, 0, 0.15);
+}
+
+textarea.admin-input {
+  resize: vertical;
+  min-height: 90px;
+}
+
+.admin-ingredients-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-ing-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.admin-add-ing-btn {
+  width: 45px;
+  height: 45px;
+  border: none;
+  border-radius: 12px;
+  background: orange;
+  color: white;
+  font-size: 22px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s ease;
+  flex-shrink: 0;
+}
+
+.admin-add-ing-btn:hover {
+  background: #ff7b00;
+  transform: scale(1.05);
+}
+
+.admin-file-upload {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.file-input {
+  padding: 12px;
+  border: 2px dashed #ccc;
+  border-radius: 14px;
+  background: #fafafa;
+  cursor: pointer;
+}
+
+.admin-img-preview {
+  width: 100%;
+  max-width: 280px;
+  border-radius: 18px;
+  object-fit: cover;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+}
+
+.admin-save-btn {
+  background: linear-gradient(135deg, #ff8c00 0%, #ff5e00 100%);
+  color: white;
+  border: none;
+  padding: 16px;
+  border-radius: 16px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.3s ease;
+  margin-top: 10px;
+}
+
+.admin-save-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(255, 140, 0, 0.3);
+}
+
+.form-error-msg {
+  background: #ffe5e5;
+  color: #d60000;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.recipe-card-relative {
+  position: relative;
+}
+
+.admin-mini-tools {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+}
+
+.admin-tool-btn {
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transition: 0.3s ease;
+}
+
+.admin-tool-btn:hover {
+  transform: scale(1.1);
+}
+
+.admin-tool-btn.delete:hover {
+  background: #ff4d4d;
+  color: white;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 768px) {
+
+  .admin-form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-recipe-form {
+    padding: 24px;
+  }
+
+  .main {
+    padding: 20px;
+    padding-top: 90px;
+  }
+}
+/* =========================
+   NEWLY ADDED SLIDER
+========================= */
+
+.recipe-slider {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  padding: 10px 5px 20px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.recipe-slider::-webkit-scrollbar {
+  display: none;
+}
+
+.recipe-slide-item {
+  flex: 0 0 auto;
+  width: 200px;
+  scroll-snap-align: start;
+  position: relative;
+  transition: 0.3s;
+}
+
+.recipe-slide-item:hover {
+  transform: scale(1.05);
+}
+
+/* =========================
+   CATEGORY SECTION
+========================= */
+
+.category-section {
+  margin-top: 50px;
+}
+
+.category-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.category-line {
+  flex: 1;
+  height: 3px;
+  background: orange;
+  border-radius: 10px;
+}
+
+
+.recipe-slider {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  padding: 10px;
+  cursor: grab;
+  scroll-behavior: smooth;
+  user-select: none;
+}
+
+.recipe-slider.dragging {
+  cursor: grabbing;
+}
+
+.recipe-slider::-webkit-scrollbar {
+  display: none;
+}
+
+.recipe-slide-item {
+  min-width: 200px;
+  flex: 0 0 auto;
+  position: relative;
+  transition: 0.3s;
+}
+
+.recipe-slide-item:hover {
+  transform: scale(1.05);
+}
+
+.admin-mini-tools {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 5px;
+}
+.recipe-slider {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  padding: 10px;
+  cursor: grab;
+  scroll-behavior: smooth;
+}
+
+.recipe-slider.dragging {
+  cursor: grabbing;
+}
+
+.recipe-slider::-webkit-scrollbar {
+  display: none;
+}
+
+.recipe-slide-item {
+  min-width: 200px;
+  flex: 0 0 auto;
+  position: relative;
+}
+
+.category-section {
+  margin-top: 50px;
+}
+
+.category-title {
+  font-size: 22px;
+  font-weight: bold;
+  margin: 20px 0;
+}
+
+.recipe-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 20px;
 }

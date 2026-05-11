@@ -1,7 +1,14 @@
+// src/components/headers.jsx
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export default function Header() {
   const navigate = useNavigate();
+  const { user } = useAuth(); // ✅ Real user from AuthContext
+
+  const initials = user?.username
+    ? user.username.slice(0, 4).toUpperCase()
+    : "USER";
 
   const headerStyle = {
     display: "flex",
@@ -11,22 +18,22 @@ export default function Header() {
     height: "70px",
     position: "fixed",
     top: 0,
-    left: "240px", 
-    width: "calc(100% - 240px)", 
+    left: "240px",
+    width: "calc(100% - 240px)",
     zIndex: 1000,
     fontFamily: "'Inter', sans-serif",
-    backgroundColor: "rgba(217, 210, 195, 0.9)", 
+    backgroundColor: "rgba(217, 210, 195, 0.9)",
     backdropFilter: "blur(12px)",
     borderBottom: "1px solid rgba(0,0,0,0.05)",
     boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
-    boxSizing: "border-box"
+    boxSizing: "border-box",
   };
 
   const searchWrapperStyle = {
     position: "relative",
     display: "flex",
     alignItems: "center",
-    flex: "0 1 400px" 
+    flex: "0 1 400px",
   };
 
   const searchInputStyle = {
@@ -37,13 +44,13 @@ export default function Header() {
     backgroundColor: "#ffffff",
     fontSize: "14px",
     outline: "none",
-    transition: "all 0.3s ease"
+    transition: "all 0.3s ease",
   };
 
   const rightSideStyle = {
     display: "flex",
     alignItems: "center",
-    gap: "clamp(10px, 2vw, 25px)" 
+    gap: "clamp(10px, 2vw, 25px)",
   };
 
   const profilePillStyle = {
@@ -55,7 +62,7 @@ export default function Header() {
     borderRadius: "30px",
     boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
     cursor: "pointer",
-    whiteSpace: "nowrap"
+    whiteSpace: "nowrap",
   };
 
   const avatarStyle = {
@@ -68,7 +75,7 @@ export default function Header() {
     alignItems: "center",
     justifyContent: "center",
     fontSize: "12px",
-    fontWeight: "bold"
+    fontWeight: "bold",
   };
 
   return (
@@ -88,21 +95,17 @@ export default function Header() {
           <span>🌐</span>
           <span className="hide-on-mobile">English</span>
         </div>
-        
-        <span 
-          style={{ cursor: "pointer", fontSize: "18px" }} 
-          onClick={() => navigate("/settings")}
-        >
+
+        <span style={{ cursor: "pointer", fontSize: "18px" }} onClick={() => navigate("/settings")}>
           ⚙️
         </span>
 
-        {/* UPDATED ONCLICK HERE */}
-        <div 
-          style={profilePillStyle} 
-          onClick={() => navigate("/profile")}
-        >
-          <div style={avatarStyle}>DRMF</div>
-          <span style={{ fontSize: "14px", fontWeight: "600" }}>Doremifa</span>
+        <div style={profilePillStyle} onClick={() => navigate("/profile")}>
+          <div style={avatarStyle}>{initials}</div>
+          {/* ✅ Real username displayed */}
+          <span style={{ fontSize: "14px", fontWeight: "600" }}>
+            {user?.username || "Guest"}
+          </span>
         </div>
       </div>
     </header>
